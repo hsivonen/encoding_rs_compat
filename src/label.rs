@@ -19,7 +19,7 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
     match cp {
         65001 => Some(all::UTF_8 as EncodingRef),
         866 => Some(all::IBM866 as EncodingRef),
-        28591 => Some(all::ISO_8859_1 as EncodingRef),
+//        28591 => Some(all::ISO_8859_1 as EncodingRef),
         28592 => Some(all::ISO_8859_2 as EncodingRef),
         28593 => Some(all::ISO_8859_3 as EncodingRef),
         28594 => Some(all::ISO_8859_4 as EncodingRef),
@@ -45,7 +45,6 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
         1258 => Some(all::WINDOWS_1258 as EncodingRef),
         1259 => Some(all::MAC_CYRILLIC as EncodingRef),
         936 | 54936 => Some(all::GB18030 as EncodingRef), // XXX technically wrong
-        52936 => Some(all::HZ as EncodingRef),
         950 => Some(all::BIG5_2003 as EncodingRef),
         20932 => Some(all::EUC_JP as EncodingRef),
         50220 => Some(all::ISO_2022_JP as EncodingRef),

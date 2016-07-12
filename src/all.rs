@@ -38,7 +38,6 @@ macro_rules! singlebyte(
 
 unique!(var=ASCII, mod=codec::ascii, val=ASCIIEncoding);
 singlebyte!(var=IBM866, mod=index::ibm866, name|whatwg="ibm866");
-singlebyte!(var=ISO_8859_1, mod=codec::singlebyte::iso_8859_1, name="iso-8859-1");
 singlebyte!(var=ISO_8859_2, mod=index::iso_8859_2, name|whatwg="iso-8859-2");
 singlebyte!(var=ISO_8859_3, mod=index::iso_8859_3, name|whatwg="iso-8859-3");
 singlebyte!(var=ISO_8859_4, mod=index::iso_8859_4, name|whatwg="iso-8859-4");
@@ -75,7 +74,6 @@ unique!(var=WINDOWS_31J, mod=codec::japanese, val=Windows31JEncoding);
 unique!(var=ISO_2022_JP, mod=codec::japanese, val=ISO2022JPEncoding);
 unique!(var=GBK, mod=codec::simpchinese, ty=GBKEncoding, val=GBK_ENCODING);
 unique!(var=GB18030, mod=codec::simpchinese, ty=GB18030Encoding, val=GB18030_ENCODING);
-unique!(var=HZ, mod=codec::simpchinese, val=HZEncoding);
 unique!(var=BIG5_2003, mod=codec::tradchinese, val=BigFive2003Encoding);
 
 pub mod whatwg {
@@ -94,7 +92,7 @@ pub fn encodings() -> &'static [EncodingRef] {
     const ENCODINGS: &'static [EncodingRef] = &[
         ASCII,
         IBM866,
-        ISO_8859_1,
+//        ISO_8859_1,
         ISO_8859_2,
         ISO_8859_3,
         ISO_8859_4,
@@ -130,7 +128,6 @@ pub fn encodings() -> &'static [EncodingRef] {
         ISO_2022_JP,
         GBK,
         GB18030,
-        HZ,
         BIG5_2003,
         whatwg::X_USER_DEFINED,
         whatwg::ISO_8859_8_I,

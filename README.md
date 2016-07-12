@@ -10,4 +10,10 @@ internals replaced. The use case is to allow Gecko to use crates that depend
 on rust-encoding without having to include duplicate data tables and converter
 functionality.
 
-_Currently, this repo is just a fork. The internals haven't been replaced, yet._
+## Differences from rust-encoding
+
+* The bugs in the converters and the spec snapshot they implement are those
+  of encoding_rs.
+
+* The HZ, ISO-8859-1 as an encoding distinct from windows-1252 and the error
+  encoding are not supported.
