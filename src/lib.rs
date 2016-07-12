@@ -211,8 +211,6 @@
 //!
 //!
 
-#![cfg_attr(test, feature(test))] // lib stability features as per RFC #507
-
 #[cfg(test)]
 extern crate test;
 
