@@ -1,0 +1,48 @@
+Summary:
+
+Release builds that omit tests are available under the MIT license (see
+LICENSE.txt).
+
+Details:
+
+encoding_rs_compat is a fork of rust-encoding.
+
+The original rust-encoding is under the MIT license (see LICENSE.txt) with
+the copyright notice:
+Copyright (c) 2013, Kang Seonghoon.
+
+The modifications to rust-encoding are Copyright 2016 Mozilla Foundation and
+are licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+https://www.apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE.txt or
+https://opensource.org/licenses/MIT>, at your option. Contributions to
+encoding_rs_compat must be MIT/Apache 2.0 dual-licensed; see CONTRIBUTING.md.
+
+The upstream rust-encoding is in the process of being retroactively relicensed
+under MIT or Apache License, Version 2.0 at the recipient's option; see
+https://github.com/lifthrasiir/rust-encoding/issues/93 . However, the
+relicensing hasn't been completed yet. Once the upstream relicensing is
+complete or it is determined that the code that hasn't been relicensed has
+been deleted from encoding_rs_compat, encoding_rs_compat as a whole can become
+dual-licensed.
+
+Additionally, builds that include unit tests contain content that under
+different licenses. This includes:
+
+ * Markus Kuhn's "UTF-8 decoder capability and stress test"
+   (https://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt), which is
+   licensed under CC-by 4.0.
+
+ * Excerpts from Wikipedia articles
+   https://en.wikipedia.org/w/index.php?title=English_language&oldid=608500518
+   https://ko.wikipedia.org/w/index.php?title=%ED%95%9C%EA%B5%AD%EC%96%B4&oldid=12331875
+   https://ja.wikipedia.org/w/index.php?title=%E6%97%A5%E6%9C%AC%E8%AA%9E&oldid=51443986
+   https://zh.wikipedia.org/w/index.php?title=%E6%B1%89%E8%AF%AD&variant=zh-cn&oldid=31224104
+   https://zh.wikipedia.org/w/index.php?title=%E6%B1%89%E8%AF%AD&variant=zh-tw&oldid=31224104
+
+   The page https://en.wikipedia.org/wiki/Wikipedia:Copyrights may be of
+   interest regarding the licensing of Wikipedia content.
+
+ * http://www.unoosa.org/oosa/SpaceLaw/outerspt.html
+
+   The page https://shop.un.org/rights-permissions may be of interest
+   regarding the copyright status of UN treaties.

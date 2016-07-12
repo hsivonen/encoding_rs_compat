@@ -1,3 +1,7 @@
+encoding_rs_compat is a fork of rust-encoding 0.2.32 with changes made by
+Henri Sivonen <hsivonen@hsivonen.fi>. Please do not bother the upstream authors
+about changes made in fork. The original AUTHORS.txt of rust-encoding follows:
+
 Encoding is mainly written by Kang Seonghoon <public+rust@mearie.org>,
 and also the following people (in ascending order):
 
