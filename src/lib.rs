@@ -223,7 +223,7 @@ pub use self::types::{CodecError, ByteWriter, StringWriter, RawEncoder, RawDecod
 pub mod types;
 
 /// Codec implementations.
-pub mod codec {
+mod codec {
     pub mod ascii;
     pub mod singlebyte;
     pub mod utf_8;
