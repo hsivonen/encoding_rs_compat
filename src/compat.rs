@@ -39,7 +39,6 @@ pub struct EncodingWrap {
 }
 
 impl types::Encoding for EncodingWrap {
-
     fn name(&self) -> &'static str {
         return self.name;
     }
@@ -55,7 +54,6 @@ impl types::Encoding for EncodingWrap {
     fn raw_decoder(&self) -> Box<RawDecoder> {
         Box::new(RawDecoderImpl::new(self.encoding))
     }
-
 }
 
 struct RawDecoderImpl {
@@ -65,12 +63,14 @@ struct RawDecoderImpl {
 
 impl RawDecoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawDecoderImpl {
-        RawDecoderImpl { decoder: encoding.new_decoder_without_bom_handling(), buffer: [0; DECODER_BUFFER_LENGTH] }
+        RawDecoderImpl {
+            decoder: encoding.new_decoder_without_bom_handling(),
+            buffer: [0; DECODER_BUFFER_LENGTH],
+        }
     }
 }
 
 impl RawDecoder for RawDecoderImpl {
-
     fn from_self(&self) -> Box<RawDecoder> {
         Box::new(RawDecoderImpl::new(self.decoder.encoding()))
     }
@@ -83,21 +83,26 @@ impl RawDecoder for RawDecoderImpl {
         output.writer_hint(self.decoder.max_utf8_buffer_length_without_replacement(input.len()));
         let mut total_read = 0usize;
         loop {
-            let (result, read, written) = self.decoder.decode_to_utf8_without_replacement(&input[total_read..], &mut self.buffer[..], false);
+            let (result, read, written) = self.decoder
+                .decode_to_utf8_without_replacement(&input[total_read..],
+                                                    &mut self.buffer[..],
+                                                    false);
             total_read += read;
             let as_str: &str = unsafe { ::std::mem::transmute(&self.buffer[..written]) };
             output.write_str(as_str);
             match result {
                 DecoderResult::InputEmpty => {
                     return (total_read, None);
-                },
+                }
                 DecoderResult::OutputFull => {
                     continue;
                 }
                 DecoderResult::Malformed(_, _) => {
                     // TODO: Figure out the exact semantics of `upto`.
-                    return (total_read, Some(CodecError {
-                        upto: total_read as isize, cause: "invalid sequence".into()
+                    return (total_read,
+                            Some(CodecError {
+                        upto: total_read as isize,
+                        cause: "invalid sequence".into(),
                     }));
                 }
             }
@@ -106,20 +111,22 @@ impl RawDecoder for RawDecoderImpl {
 
     fn raw_finish(&mut self, output: &mut StringWriter) -> Option<CodecError> {
         let dummy: [u8; 0] = [0; 0];
-        let (result, read, written) = self.decoder.decode_to_utf8_without_replacement(&dummy[0..0], &mut self.buffer[..], true);
+        let (result, read, written) = self.decoder
+            .decode_to_utf8_without_replacement(&dummy[0..0], &mut self.buffer[..], true);
         let as_str: &str = unsafe { ::std::mem::transmute(&self.buffer[..written]) };
         output.write_str(as_str);
         match result {
             DecoderResult::InputEmpty => {
                 return None;
-            },
+            }
             DecoderResult::OutputFull => {
                 unreachable!("No way buffer could get filled from empty input.");
             }
             DecoderResult::Malformed(_, _) => {
                 // TODO: Figure out the exact semantics of `upto`.
                 return Some(CodecError {
-                    upto: read as isize, cause: "invalid sequence".into()
+                    upto: read as isize,
+                    cause: "invalid sequence".into(),
                 });
             }
         }
@@ -133,12 +140,14 @@ struct RawEncoderImpl {
 
 impl RawEncoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawEncoderImpl {
-        RawEncoderImpl { encoder: encoding.new_encoder(), buffer: [0; ENCODER_BUFFER_LENGTH] }
+        RawEncoderImpl {
+            encoder: encoding.new_encoder(),
+            buffer: [0; ENCODER_BUFFER_LENGTH],
+        }
     }
 }
 
 impl RawEncoder for RawEncoderImpl {
-
     fn from_self(&self) -> Box<RawEncoder> {
         Box::new(RawEncoderImpl::new(self.encoder.encoding()))
     }
@@ -151,20 +160,25 @@ impl RawEncoder for RawEncoderImpl {
         output.writer_hint(self.encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
         let mut total_read = 0usize;
         loop {
-            let (result, read, written) = self.encoder.encode_from_utf8_without_replacement(&input[total_read..], &mut self.buffer[..], false);
+            let (result, read, written) = self.encoder
+                .encode_from_utf8_without_replacement(&input[total_read..],
+                                                      &mut self.buffer[..],
+                                                      false);
             total_read += read;
             output.write_bytes(&self.buffer[..written]);
             match result {
                 EncoderResult::InputEmpty => {
                     return (total_read, None);
-                },
+                }
                 EncoderResult::OutputFull => {
                     continue;
                 }
                 EncoderResult::Unmappable(_) => {
                     // TODO: Figure out the exact semantics of `upto`.
-                    return (total_read, Some(CodecError {
-                        upto: total_read as isize, cause: "unrepresentable character".into()
+                    return (total_read,
+                            Some(CodecError {
+                        upto: total_read as isize,
+                        cause: "unrepresentable character".into(),
                     }));
                 }
             }
@@ -172,19 +186,21 @@ impl RawEncoder for RawEncoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut ByteWriter) -> Option<CodecError> {
-        let (result, read, written) = self.encoder.encode_from_utf8_without_replacement("", &mut self.buffer[..], false);
+        let (result, read, written) = self.encoder
+            .encode_from_utf8_without_replacement("", &mut self.buffer[..], false);
         output.write_bytes(&self.buffer[..written]);
         match result {
             EncoderResult::InputEmpty => {
                 return None;
-            },
+            }
             EncoderResult::OutputFull => {
                 unreachable!("No way buffer could get filled from empty input.");
             }
             EncoderResult::Unmappable(_) => {
                 // TODO: Figure out the exact semantics of `upto`.
                 return Some(CodecError {
-                    upto: read as isize, cause: "unrepresentable character".into()
+                    upto: read as isize,
+                    cause: "unrepresentable character".into(),
                 });
             }
         }
@@ -205,7 +221,7 @@ pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
     let enc = encoding_rs::Encoding::for_label(label.as_bytes());
     match enc {
         None => None,
-        Some(encoding) => Some(from_encoding_rs(encoding))
+        Some(encoding) => Some(from_encoding_rs(encoding)),
     }
 }
 

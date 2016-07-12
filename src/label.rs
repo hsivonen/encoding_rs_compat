@@ -21,7 +21,7 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
     match cp {
         65001 => Some(all::UTF_8 as EncodingRef),
         866 => Some(all::IBM866 as EncodingRef),
-//        28591 => Some(all::ISO_8859_1 as EncodingRef),
+        //        28591 => Some(all::ISO_8859_1 as EncodingRef),
         28592 => Some(all::ISO_8859_2 as EncodingRef),
         28593 => Some(all::ISO_8859_3 as EncodingRef),
         28594 => Some(all::ISO_8859_4 as EncodingRef),
@@ -54,7 +54,7 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
         949 => Some(all::WINDOWS_949 as EncodingRef),
         1201 => Some(all::UTF_16BE as EncodingRef),
         1200 => Some(all::UTF_16LE as EncodingRef),
-        _ => None
+        _ => None,
     }
 }
 
@@ -78,7 +78,9 @@ mod tests {
         // checks if the `whatwg_name` method returns the label that resolves back to that encoding
         for encoding in all::encodings() {
             if let Some(whatwg_name) = encoding.whatwg_name() {
-                if whatwg_name == "replacement" { continue; }
+                if whatwg_name == "replacement" {
+                    continue;
+                }
                 assert_eq!(encoding_from_whatwg_label(whatwg_name).and_then(|e| e.whatwg_name()),
                            Some(whatwg_name));
             }
@@ -87,9 +89,10 @@ mod tests {
 
     #[bench]
     fn bench_encoding_from_whatwg_label(bencher: &mut test::Bencher) {
-        bencher.iter(|| test::black_box({
-            encoding_from_whatwg_label("iso-8859-bazinga")
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                encoding_from_whatwg_label("iso-8859-bazinga")
+            })
+        })
     }
 }
-

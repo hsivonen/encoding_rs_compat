@@ -2,55 +2,54 @@
 // Copyright (c) 2013-2015, Kang Seonghoon.
 // See README.md and LICENSE.txt for details.
 
-/*!
- * Interface to the character encoding.
- *
- * # Raw incremental interface
- *
- * Methods which name starts with `raw_` constitute the raw incremental interface,
- * the lowest-available API for encoders and decoders.
- * This interface divides the entire input to four parts:
- *
- * - **Processed** bytes do not affect the future result.
- * - **Unprocessed** bytes may affect the future result
- *   and can be a part of problematic sequence according to the future input.
- * - **Problematic** byte is the first byte that causes an error condition.
- * - **Remaining** bytes are not yet processed nor read,
- *   so the caller should feed any remaining bytes again.
- *
- * The following figure illustrates an example of successive `raw_feed` calls:
- *
- * ````notrust
- * 1st raw_feed   :2nd raw_feed   :3rd raw_feed
- * ----------+----:---------------:--+--+---------
- *           |    :               :  |  |
- * ----------+----:---------------:--+--+---------
- * processed  unprocessed             |  remaining
- *                               problematic
- * ````
- *
- * Since these parts can span the multiple input sequences to `raw_feed`,
- * `raw_feed` returns two offsets (one optional)
- * with that the caller can track the problematic sequence.
- * The first offset (the first `usize` in the tuple) points to the first unprocessed bytes,
- * or is zero when unprocessed bytes have started before the current call.
- * (The first unprocessed byte can also be at offset 0,
- * which doesn't make a difference for the caller.)
- * The second offset (`upto` field in the `CodecError` struct), if any,
- * points to the first remaining bytes.
- *
- * If the caller needs to recover the error via the problematic sequence,
- * then the caller starts to save the unprocessed bytes when the first offset < the input length,
- * appends any new unprocessed bytes while the first offset is zero,
- * and discards unprocessed bytes when first offset becomes non-zero
- * while saving new unprocessed bytes when the first offset < the input length.
- * Then the caller checks for the error condition
- * and can use the saved unprocessed bytes for error recovery.
- * Alternatively, if the caller only wants to replace the problematic sequence
- * with a fixed string (like U+FFFD),
- * then it can just discard the first sequence and can emit the fixed string on an error.
- * It still has to feed the input bytes starting at the second offset again.
- */
+//! Interface to the character encoding.
+//!
+//! # Raw incremental interface
+//!
+//! Methods which name starts with `raw_` constitute the raw incremental interface,
+//! the lowest-available API for encoders and decoders.
+//! This interface divides the entire input to four parts:
+//!
+//! - **Processed** bytes do not affect the future result.
+//! - **Unprocessed** bytes may affect the future result
+//!   and can be a part of problematic sequence according to the future input.
+//! - **Problematic** byte is the first byte that causes an error condition.
+//! - **Remaining** bytes are not yet processed nor read,
+//!   so the caller should feed any remaining bytes again.
+//!
+//! The following figure illustrates an example of successive `raw_feed` calls:
+//!
+//! ````notrust
+//! 1st raw_feed   :2nd raw_feed   :3rd raw_feed
+//! ----------+----:---------------:--+--+---------
+//!           |    :               :  |  |
+//! ----------+----:---------------:--+--+---------
+//! processed  unprocessed             |  remaining
+//!                               problematic
+//! ````
+//!
+//! Since these parts can span the multiple input sequences to `raw_feed`,
+//! `raw_feed` returns two offsets (one optional)
+//! with that the caller can track the problematic sequence.
+//! The first offset (the first `usize` in the tuple) points to the first unprocessed bytes,
+//! or is zero when unprocessed bytes have started before the current call.
+//! (The first unprocessed byte can also be at offset 0,
+//! which doesn't make a difference for the caller.)
+//! The second offset (`upto` field in the `CodecError` struct), if any,
+//! points to the first remaining bytes.
+//!
+//! If the caller needs to recover the error via the problematic sequence,
+//! then the caller starts to save the unprocessed bytes when the first offset < the input length,
+//! appends any new unprocessed bytes while the first offset is zero,
+//! and discards unprocessed bytes when first offset becomes non-zero
+//! while saving new unprocessed bytes when the first offset < the input length.
+//! Then the caller checks for the error condition
+//! and can use the saved unprocessed bytes for error recovery.
+//! Alternatively, if the caller only wants to replace the problematic sequence
+//! with a fixed string (like U+FFFD),
+//! then it can just discard the first sequence and can emit the fixed string on an error.
+//! It still has to feed the input bytes starting at the second offset again.
+//!
 use std::borrow::Cow;
 
 /// Error information from either encoder or decoder.
@@ -137,7 +136,9 @@ pub trait RawEncoder: 'static {
 
     /// Returns true if this encoding is compatible to ASCII,
     /// i.e. U+0000 through U+007F always map to bytes 00 through 7F and nothing else.
-    fn is_ascii_compatible(&self) -> bool { false }
+    fn is_ascii_compatible(&self) -> bool {
+        false
+    }
 
     /// Feeds given portion of string to the encoder,
     /// pushes the an encoded byte sequence at the end of the given output,
@@ -161,7 +162,9 @@ pub trait RawDecoder: 'static {
 
     /// Returns true if this encoding is compatible to ASCII,
     /// i.e. bytes 00 through 7F always map to U+0000 through U+007F and nothing else.
-    fn is_ascii_compatible(&self) -> bool { false }
+    fn is_ascii_compatible(&self) -> bool {
+        false
+    }
 
     /// Feeds given portion of byte sequence to the encoder,
     /// pushes the a decoded string at the end of the given output,
@@ -189,7 +192,9 @@ pub trait Encoding {
 
     /// Returns a name of given encoding defined in the WHATWG Encoding standard, if any.
     /// This name often differs from `name` due to the compatibility reason.
-    fn whatwg_name(&self) -> Option<&'static str> { None }
+    fn whatwg_name(&self) -> Option<&'static str> {
+        None
+    }
 
     /// Creates a new encoder.
     fn raw_encoder(&self) -> Box<RawEncoder>;
@@ -207,9 +212,11 @@ pub trait Encoding {
     }
 
     /// Encode into a `ByteWriter`.
-    fn encode_to(&self, input: &str, trap: EncoderTrap, ret: &mut ByteWriter)
-        -> Result<(), Cow<'static, str>>
-    {
+    fn encode_to(&self,
+                 input: &str,
+                 trap: EncoderTrap,
+                 ret: &mut ByteWriter)
+                 -> Result<(), Cow<'static, str>> {
         // we don't need to keep `unprocessed` here;
         // `raw_feed` should process as much input as possible.
         let mut encoder = self.raw_encoder();
@@ -236,7 +243,9 @@ pub trait Encoding {
                         }
                         None => {}
                     }
-                    if remaining >= input.len() { return Ok(()); }
+                    if remaining >= input.len() {
+                        return Ok(());
+                    }
                 }
             }
         }
@@ -255,9 +264,11 @@ pub trait Encoding {
     ///
     /// This does *not* handle partial characters at the beginning or end of `input`!
     /// Use `RawDecoder` for incremental decoding.
-    fn decode_to(&self, input: &[u8], trap: DecoderTrap, ret: &mut StringWriter)
-        -> Result<(), Cow<'static, str>>
-    {
+    fn decode_to(&self,
+                 input: &[u8],
+                 trap: DecoderTrap,
+                 ret: &mut StringWriter)
+                 -> Result<(), Cow<'static, str>> {
         // we don't need to keep `unprocessed` here;
         // `raw_feed` should process as much input as possible.
         let mut decoder = self.raw_decoder();
@@ -284,7 +295,9 @@ pub trait Encoding {
                         }
                         None => {}
                     }
-                    if remaining >= input.len() { return Ok(()); }
+                    if remaining >= input.len() {
+                        return Ok(());
+                    }
                 }
             }
         }
@@ -292,12 +305,16 @@ pub trait Encoding {
 }
 
 /// A type of the bare function in `EncoderTrap` values.
-pub type EncoderTrapFunc =
-    extern "Rust" fn(encoder: &mut RawEncoder, input: &str, output: &mut ByteWriter) -> bool;
+pub type EncoderTrapFunc = fn(encoder: &mut RawEncoder,
+                              input: &str,
+                              output: &mut ByteWriter)
+                              -> bool;
 
 /// A type of the bare function in `DecoderTrap` values.
-pub type DecoderTrapFunc =
-    extern "Rust" fn(decoder: &mut RawDecoder, input: &[u8], output: &mut StringWriter) -> bool;
+pub type DecoderTrapFunc = fn(decoder: &mut RawDecoder,
+                              input: &[u8],
+                              output: &mut StringWriter)
+                              -> bool;
 
 /// Trap, which handles decoder errors.
 #[derive(Copy)]
@@ -321,9 +338,12 @@ impl DecoderTrap {
     /// Returns true only when it is fine to keep going.
     pub fn trap(&self, decoder: &mut RawDecoder, input: &[u8], output: &mut StringWriter) -> bool {
         match *self {
-            DecoderTrap::Strict     => false,
-            DecoderTrap::Replace    => { output.write_char('\u{fffd}'); true },
-            DecoderTrap::Ignore     => true,
+            DecoderTrap::Strict => false,
+            DecoderTrap::Replace => {
+                output.write_char('\u{fffd}');
+                true
+            }
+            DecoderTrap::Ignore => true,
             DecoderTrap::Call(func) => func(decoder, input, output),
         }
     }
@@ -365,9 +385,13 @@ impl EncoderTrap {
     /// Handles an encoder error. May write to the output writer.
     /// Returns true only when it is fine to keep going.
     pub fn trap(&self, encoder: &mut RawEncoder, input: &str, output: &mut ByteWriter) -> bool {
-        fn reencode(encoder: &mut RawEncoder, input: &str, output: &mut ByteWriter,
-                    trapname: &str) -> bool {
-            if encoder.is_ascii_compatible() { // optimization!
+        fn reencode(encoder: &mut RawEncoder,
+                    input: &str,
+                    output: &mut ByteWriter,
+                    trapname: &str)
+                    -> bool {
+            if encoder.is_ascii_compatible() {
+                // optimization!
                 output.write_bytes(input.as_bytes());
             } else {
                 let (_, err) = encoder.raw_feed(input, output);
@@ -379,16 +403,16 @@ impl EncoderTrap {
         }
 
         match *self {
-            EncoderTrap::Strict     => false,
-            EncoderTrap::Replace    => reencode(encoder, "?", output, "Replace"),
-            EncoderTrap::Ignore     => true,
-            EncoderTrap::NcrEscape  => {
+            EncoderTrap::Strict => false,
+            EncoderTrap::Replace => reencode(encoder, "?", output, "Replace"),
+            EncoderTrap::Ignore => true,
+            EncoderTrap::NcrEscape => {
                 let mut escapes = String::new();
                 for ch in input.chars() {
                     escapes.push_str(&format!("&#{};", ch as isize));
                 }
                 reencode(encoder, &escapes, output, "NcrEscape")
-            },
+            }
             EncoderTrap::Call(func) => func(encoder, input, output),
         }
     }
@@ -409,8 +433,10 @@ impl Clone for EncoderTrap {
 /// Determine the encoding by looking for a Byte Order Mark (BOM)
 /// and decoded a single string in memory.
 /// Return the result and the used encoding.
-pub fn decode(input: &[u8], trap: DecoderTrap, fallback_encoding: EncodingRef)
-           -> (Result<String, Cow<'static, str>>, EncodingRef) {
+pub fn decode(input: &[u8],
+              trap: DecoderTrap,
+              fallback_encoding: EncodingRef)
+              -> (Result<String, Cow<'static, str>>, EncodingRef) {
     use all::{UTF_8, UTF_16LE, UTF_16BE};
     if input.starts_with(&[0xEF, 0xBB, 0xBF]) {
         (UTF_8.decode(&input[3..], trap), UTF_8 as EncodingRef)
@@ -433,18 +459,29 @@ mod tests {
     // a contrived encoding example: same as ASCII, but inserts `prepend` between each character
     // within two "e"s (so that `widespread` becomes `wide*s*p*r*ead` and `eeeeasel` becomes
     // `e*ee*ease*l` where `*` is substituted by `prepend`) and prohibits `prohibit` character.
-    struct MyEncoder { flag: bool, prohibit: char, prepend: &'static str, toggle: bool }
+    struct MyEncoder {
+        flag: bool,
+        prohibit: char,
+        prepend: &'static str,
+        toggle: bool,
+    }
     impl RawEncoder for MyEncoder {
         fn from_self(&self) -> Box<RawEncoder> {
-            Box::new(MyEncoder { flag: self.flag,
-                                 prohibit: self.prohibit,
-                                 prepend: self.prepend,
-                                 toggle: false })
+            Box::new(MyEncoder {
+                flag: self.flag,
+                prohibit: self.prohibit,
+                prepend: self.prepend,
+                toggle: false,
+            })
         }
-        fn is_ascii_compatible(&self) -> bool { self.flag }
-        fn raw_feed(&mut self, input: &str,
-                    output: &mut ByteWriter) -> (usize, Option<CodecError>) {
-            for ((i,j), ch) in input.index_iter() {
+        fn is_ascii_compatible(&self) -> bool {
+            self.flag
+        }
+        fn raw_feed(&mut self,
+                    input: &str,
+                    output: &mut ByteWriter)
+                    -> (usize, Option<CodecError>) {
+            for ((i, j), ch) in input.index_iter() {
                 if ch <= '\u{7f}' && ch != self.prohibit {
                     if self.toggle && !self.prepend.is_empty() {
                         output.write_bytes(self.prepend.as_bytes());
@@ -454,33 +491,54 @@ mod tests {
                         self.toggle = !self.toggle;
                     }
                 } else {
-                    return (i, Some(CodecError { upto: j as isize,
-                                                 cause: "!!!".into() }));
+                    return (i,
+                            Some(CodecError {
+                        upto: j as isize,
+                        cause: "!!!".into(),
+                    }));
                 }
             }
             (input.len(), None)
         }
-        fn raw_finish(&mut self, _output: &mut ByteWriter) -> Option<CodecError> { None }
+        fn raw_finish(&mut self, _output: &mut ByteWriter) -> Option<CodecError> {
+            None
+        }
     }
 
-    struct MyEncoding { flag: bool, prohibit: char, prepend: &'static str }
+    struct MyEncoding {
+        flag: bool,
+        prohibit: char,
+        prepend: &'static str,
+    }
     impl Encoding for MyEncoding {
-        fn name(&self) -> &'static str { "my encoding" }
-        fn raw_encoder(&self) -> Box<RawEncoder> {
-            Box::new(MyEncoder { flag: self.flag,
-                                 prohibit: self.prohibit,
-                                 prepend: self.prepend,
-                                 toggle: false })
+        fn name(&self) -> &'static str {
+            "my encoding"
         }
-        fn raw_decoder(&self) -> Box<RawDecoder> { panic!("not supported") }
+        fn raw_encoder(&self) -> Box<RawEncoder> {
+            Box::new(MyEncoder {
+                flag: self.flag,
+                prohibit: self.prohibit,
+                prepend: self.prepend,
+                toggle: false,
+            })
+        }
+        fn raw_decoder(&self) -> Box<RawDecoder> {
+            panic!("not supported")
+        }
     }
 
     #[test]
     fn test_reencoding_trap_with_ascii_compatible_encoding() {
-        static COMPAT: &'static MyEncoding =
-            &MyEncoding { flag: true, prohibit: '\u{80}', prepend: "" };
-        static INCOMPAT: &'static MyEncoding =
-            &MyEncoding { flag: false, prohibit: '\u{80}', prepend: "" };
+        static COMPAT: &'static MyEncoding = &MyEncoding {
+            flag: true,
+            prohibit: '\u{80}',
+            prepend: "",
+        };
+        static INCOMPAT: &'static MyEncoding = &MyEncoding {
+            flag: false,
+            prohibit: '\u{80}',
+            prepend: "",
+        };
 
         assert_eq!(COMPAT.encode("Hello\u{203d} I'm fine.", NcrEscape),
                    Ok(b"Hello&#8253; I'm fine.".to_vec()));
@@ -490,10 +548,16 @@ mod tests {
 
     #[test]
     fn test_reencoding_trap_with_ascii_incompatible_encoding() {
-        static COMPAT: &'static MyEncoding =
-            &MyEncoding { flag: true, prohibit: '\u{80}', prepend: "*" };
-        static INCOMPAT: &'static MyEncoding =
-            &MyEncoding { flag: false, prohibit: '\u{80}', prepend: "*" };
+        static COMPAT: &'static MyEncoding = &MyEncoding {
+            flag: true,
+            prohibit: '\u{80}',
+            prepend: "*",
+        };
+        static INCOMPAT: &'static MyEncoding = &MyEncoding {
+            flag: false,
+            prohibit: '\u{80}',
+            prepend: "*",
+        };
 
         // this should behave incorrectly as the encoding broke the assumption.
         assert_eq!(COMPAT.encode("Hello\u{203d} I'm fine.", NcrEscape),
@@ -505,7 +569,11 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_reencoding_trap_can_fail() {
-        static FAIL: &'static MyEncoding = &MyEncoding { flag: false, prohibit: '&', prepend: "" };
+        static FAIL: &'static MyEncoding = &MyEncoding {
+            flag: false,
+            prohibit: '&',
+            prepend: "",
+        };
 
         // this should fail as this contrived encoding does not support `&` at all
         let _ = FAIL.encode("Hello\u{203d} I'm fine.", NcrEscape);

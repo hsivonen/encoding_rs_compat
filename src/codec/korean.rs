@@ -24,7 +24,10 @@ mod windows949_tests {
         assert_feed_ok!(e, "", "", []);
         assert_feed_ok!(e, "\u{ac00}", "", [0xb0, 0xa1]);
         assert_feed_ok!(e, "\u{b098}\u{b2e4}", "", [0xb3, 0xaa, 0xb4, 0xd9]);
-        assert_feed_ok!(e, "\u{bdc1}\u{314b}\u{d7a3}", "", [0x94, 0xee, 0xa4, 0xbb, 0xc6, 0x52]);
+        assert_feed_ok!(e,
+                        "\u{bdc1}\u{314b}\u{d7a3}",
+                        "",
+                        [0x94, 0xee, 0xa4, 0xbb, 0xc6, 0x52]);
         assert_finish_ok!(e, []);
     }
 
@@ -45,7 +48,9 @@ mod windows949_tests {
         assert_feed_ok!(d, [], [], "");
         assert_feed_ok!(d, [0xb0, 0xa1], [], "\u{ac00}");
         assert_feed_ok!(d, [0xb3, 0xaa, 0xb4, 0xd9], [], "\u{b098}\u{b2e4}");
-        assert_feed_ok!(d, [0x94, 0xee, 0xa4, 0xbb, 0xc6, 0x52, 0xc1, 0x64], [],
+        assert_feed_ok!(d,
+                        [0x94, 0xee, 0xa4, 0xbb, 0xc6, 0x52, 0xc1, 0x64],
+                        [],
                         "\u{bdc1}\u{314b}\u{d7a3}\u{d58f}");
         assert_finish_ok!(d, "");
     }
@@ -137,19 +142,23 @@ mod windows949_tests {
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::KOREAN_TEXT;
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            Windows949Encoding.encode(&s, EncoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                Windows949Encoding.encode(&s, EncoderTrap::Strict)
+            })
+        })
     }
 
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
-        let s = Windows949Encoding.encode(testutils::KOREAN_TEXT,
-                                          EncoderTrap::Strict).ok().unwrap();
+        let s = Windows949Encoding.encode(testutils::KOREAN_TEXT, EncoderTrap::Strict)
+            .ok()
+            .unwrap();
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            Windows949Encoding.decode(&s, DecoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                Windows949Encoding.decode(&s, DecoderTrap::Strict)
+            })
+        })
     }
 }
-

@@ -20,4 +20,3 @@ mod tests {
         assert_feed_err!(e, "A", "\u{10000}", "B", [0x41]);
     }
 }
-

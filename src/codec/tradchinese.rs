@@ -22,7 +22,9 @@ mod bigfive2003_tests {
         assert_feed_ok!(e, "A", "", [0x41]);
         assert_feed_ok!(e, "BC", "", [0x42, 0x43]);
         assert_feed_ok!(e, "", "", []);
-        assert_feed_ok!(e, "\u{4e2d}\u{83ef}\u{6c11}\u{570b}", "",
+        assert_feed_ok!(e,
+                        "\u{4e2d}\u{83ef}\u{6c11}\u{570b}",
+                        "",
                         [0xa4, 0xa4, 0xb5, 0xd8, 0xa5, 0xc1, 0xb0, 0xea]);
         assert_feed_ok!(e, "1\u{20ac}/m", "", [0x31, 0xa3, 0xe1, 0x2f, 0x6d]);
         assert_feed_ok!(e, "\u{ffed}", "", [0xf9, 0xfe]);
@@ -44,7 +46,9 @@ mod bigfive2003_tests {
         assert_feed_ok!(d, [0x41], [], "A");
         assert_feed_ok!(d, [0x42, 0x43], [], "BC");
         assert_feed_ok!(d, [], [], "");
-        assert_feed_ok!(d, [0xa4, 0xa4, 0xb5, 0xd8, 0xa5, 0xc1, 0xb0, 0xea], [],
+        assert_feed_ok!(d,
+                        [0xa4, 0xa4, 0xb5, 0xd8, 0xa5, 0xc1, 0xb0, 0xea],
+                        [],
                         "\u{4e2d}\u{83ef}\u{6c11}\u{570b}");
         assert_feed_ok!(d, [], [0xa4], "");
         assert_feed_ok!(d, [0xa4, 0xb5, 0xd8], [0xa5], "\u{4e2d}\u{83ef}");
@@ -52,7 +56,9 @@ mod bigfive2003_tests {
         assert_feed_ok!(d, [0x31, 0xa3, 0xe1, 0x2f, 0x6d], [], "1\u{20ac}/m");
         assert_feed_ok!(d, [0xf9, 0xfe], [], "\u{ffed}");
         assert_feed_ok!(d, [0x87, 0x7e], [], "\u{3eec}"); // HKSCS-2008 addition
-        assert_feed_ok!(d, [0x88, 0x62, 0x88, 0x64, 0x88, 0xa3, 0x88, 0xa5], [],
+        assert_feed_ok!(d,
+                        [0x88, 0x62, 0x88, 0x64, 0x88, 0xa3, 0x88, 0xa5],
+                        [],
                         "\u{ca}\u{304}\u{00ca}\u{30c}\u{ea}\u{304}\u{ea}\u{30c}"); // 2-byte output
         assert_finish_ok!(d, "");
     }
@@ -122,18 +128,23 @@ mod bigfive2003_tests {
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::TRADITIONAL_CHINESE_TEXT;
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            BigFive2003Encoding.encode(&s, EncoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                BigFive2003Encoding.encode(&s, EncoderTrap::Strict)
+            })
+        })
     }
 
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
-        let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT,
-                                           EncoderTrap::Strict).ok().unwrap();
+        let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT, EncoderTrap::Strict)
+            .ok()
+            .unwrap();
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            BigFive2003Encoding.decode(&s, DecoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                BigFive2003Encoding.decode(&s, DecoderTrap::Strict)
+            })
+        })
     }
 }

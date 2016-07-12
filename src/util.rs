@@ -23,10 +23,10 @@ pub struct StrCharIndexIterator<'r> {
 }
 
 impl<'r> Iterator for StrCharIndexIterator<'r> {
-    type Item = ((usize,usize), char);
+    type Item = ((usize, usize), char);
 
     #[inline]
-    fn next(&mut self) -> Option<((usize,usize), char)> {
+    fn next(&mut self) -> Option<((usize, usize), char)> {
         if let Some(ch) = self.chars.next() {
             let prev = self.index;
             let next = prev + ch.len_utf8();
@@ -46,6 +46,9 @@ pub trait StrCharIndex<'r> {
 impl<'r> StrCharIndex<'r> for &'r str {
     /// Iterates over each character with corresponding byte offset range.
     fn index_iter(&self) -> StrCharIndexIterator<'r> {
-        StrCharIndexIterator { index: 0, chars: self.chars() }
+        StrCharIndexIterator {
+            index: 0,
+            chars: self.chars(),
+        }
     }
 }

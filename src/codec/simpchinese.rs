@@ -23,18 +23,26 @@ mod gb18030_tests {
         assert_feed_ok!(e, "A", "", [0x41]);
         assert_feed_ok!(e, "BC", "", [0x42, 0x43]);
         assert_feed_ok!(e, "", "", []);
-        assert_feed_ok!(e, "\u{4e2d}\u{534e}\u{4eba}\u{6c11}\u{5171}\u{548c}\u{56fd}", "",
-                        [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1,
-                         0xb9, 0xb2, 0xba, 0xcd, 0xb9, 0xfa]);
+        assert_feed_ok!(e,
+                        "\u{4e2d}\u{534e}\u{4eba}\u{6c11}\u{5171}\u{548c}\u{56fd}",
+                        "",
+                        [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1, 0xb9, 0xb2, 0xba, 0xcd,
+                         0xb9, 0xfa]);
         assert_feed_ok!(e, "1\u{20ac}/m", "", [0x31, 0xa2, 0xe3, 0x2f, 0x6d]);
-        assert_feed_ok!(e, "\u{ff21}\u{ff22}\u{ff23}", "", [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3]);
+        assert_feed_ok!(e,
+                        "\u{ff21}\u{ff22}\u{ff23}",
+                        "",
+                        [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3]);
         assert_feed_ok!(e, "\u{80}", "", [0x81, 0x30, 0x81, 0x30]);
         assert_feed_ok!(e, "\u{81}", "", [0x81, 0x30, 0x81, 0x31]);
         assert_feed_ok!(e, "\u{a3}", "", [0x81, 0x30, 0x84, 0x35]);
         assert_feed_ok!(e, "\u{a4}", "", [0xa1, 0xe8]);
         assert_feed_ok!(e, "\u{a5}", "", [0x81, 0x30, 0x84, 0x36]);
         assert_feed_ok!(e, "\u{10ffff}", "", [0xe3, 0x32, 0x9a, 0x35]);
-        assert_feed_ok!(e, "\u{2a6a5}\u{3007}", "", [0x98, 0x35, 0xee, 0x37, 0xa9, 0x96]);
+        assert_feed_ok!(e,
+                        "\u{2a6a5}\u{3007}",
+                        "",
+                        [0x98, 0x35, 0xee, 0x37, 0xa9, 0x96]);
         assert_finish_ok!(e, []);
     }
 
@@ -44,18 +52,26 @@ mod gb18030_tests {
         assert_feed_ok!(d, [0x41], [], "A");
         assert_feed_ok!(d, [0x42, 0x43], [], "BC");
         assert_feed_ok!(d, [], [], "");
-        assert_feed_ok!(d, [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1,
-                            0xb9, 0xb2, 0xba, 0xcd, 0xb9, 0xfa], [],
+        assert_feed_ok!(d,
+                        [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1, 0xb9, 0xb2, 0xba, 0xcd,
+                         0xb9, 0xfa],
+                        [],
                         "\u{4e2d}\u{534e}\u{4eba}\u{6c11}\u{5171}\u{548c}\u{56fd}");
         assert_feed_ok!(d, [0x31, 0x80, 0x2f, 0x6d], [], "1\u{20ac}/m");
-        assert_feed_ok!(d, [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3], [], "\u{ff21}\u{ff22}\u{ff23}");
+        assert_feed_ok!(d,
+                        [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3],
+                        [],
+                        "\u{ff21}\u{ff22}\u{ff23}");
         assert_feed_ok!(d, [0x81, 0x30, 0x81, 0x30], [], "\u{80}");
         assert_feed_ok!(d, [0x81, 0x30, 0x81, 0x31], [], "\u{81}");
         assert_feed_ok!(d, [0x81, 0x30, 0x84, 0x35], [], "\u{a3}");
-        assert_feed_ok!(d, [0xa1, 0xe8], [], "\u{a4}" );
+        assert_feed_ok!(d, [0xa1, 0xe8], [], "\u{a4}");
         assert_feed_ok!(d, [0x81, 0x30, 0x84, 0x36], [], "\u{a5}");
         assert_feed_ok!(d, [0xe3, 0x32, 0x9a, 0x35], [], "\u{10ffff}");
-        assert_feed_ok!(d, [0x98, 0x35, 0xee, 0x37, 0xa9, 0x96], [], "\u{2a6a5}\u{3007}");
+        assert_feed_ok!(d,
+                        [0x98, 0x35, 0xee, 0x37, 0xa9, 0x96],
+                        [],
+                        "\u{2a6a5}\u{3007}");
         assert_finish_ok!(d, "");
     }
 
@@ -162,19 +178,24 @@ mod gb18030_tests {
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            GB18030_ENCODING.encode(&s, EncoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                GB18030_ENCODING.encode(&s, EncoderTrap::Strict)
+            })
+        })
     }
 
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
-        let s = GB18030_ENCODING.encode(testutils::SIMPLIFIED_CHINESE_TEXT,
-                                       EncoderTrap::Strict).ok().unwrap();
+        let s = GB18030_ENCODING.encode(testutils::SIMPLIFIED_CHINESE_TEXT, EncoderTrap::Strict)
+            .ok()
+            .unwrap();
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            GB18030_ENCODING.decode(&s, DecoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                GB18030_ENCODING.decode(&s, DecoderTrap::Strict)
+            })
+        })
     }
 }
 
@@ -193,11 +214,16 @@ mod gbk_tests {
         assert_feed_ok!(e, "A", "", [0x41]);
         assert_feed_ok!(e, "BC", "", [0x42, 0x43]);
         assert_feed_ok!(e, "", "", []);
-        assert_feed_ok!(e, "\u{4e2d}\u{534e}\u{4eba}\u{6c11}\u{5171}\u{548c}\u{56fd}", "",
-                        [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1,
-                         0xb9, 0xb2, 0xba, 0xcd, 0xb9, 0xfa]);
+        assert_feed_ok!(e,
+                        "\u{4e2d}\u{534e}\u{4eba}\u{6c11}\u{5171}\u{548c}\u{56fd}",
+                        "",
+                        [0xd6, 0xd0, 0xbb, 0xaa, 0xc8, 0xcb, 0xc3, 0xf1, 0xb9, 0xb2, 0xba, 0xcd,
+                         0xb9, 0xfa]);
         assert_feed_ok!(e, "1\u{20ac}/m", "", [0x31, 0x80, 0x2f, 0x6d]);
-        assert_feed_ok!(e, "\u{ff21}\u{ff22}\u{ff23}", "", [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3]);
+        assert_feed_ok!(e,
+                        "\u{ff21}\u{ff22}\u{ff23}",
+                        "",
+                        [0xa3, 0xc1, 0xa3, 0xc2, 0xa3, 0xc3]);
         assert_feed_err!(e, "", "\u{80}", "", []);
         assert_feed_err!(e, "", "\u{81}", "", []);
         assert_feed_err!(e, "", "\u{a3}", "", []);
@@ -213,8 +239,10 @@ mod gbk_tests {
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;
         bencher.bytes = s.len() as u64;
-        bencher.iter(|| test::black_box({
-            GBK_ENCODING.encode(&s, EncoderTrap::Strict)
-        }))
+        bencher.iter(|| {
+            test::black_box({
+                GBK_ENCODING.encode(&s, EncoderTrap::Strict)
+            })
+        })
     }
 }
