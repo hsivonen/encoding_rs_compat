@@ -36,7 +36,6 @@ macro_rules! singlebyte(
     )
 );
 
-unique!(var=ERROR, mod=codec::error, val=ErrorEncoding);
 unique!(var=ASCII, mod=codec::ascii, val=ASCIIEncoding);
 singlebyte!(var=IBM866, mod=index::ibm866, name|whatwg="ibm866");
 singlebyte!(var=ISO_8859_1, mod=codec::singlebyte::iso_8859_1, name="iso-8859-1");
@@ -93,7 +92,6 @@ pub mod whatwg {
 pub fn encodings() -> &'static [EncodingRef] {
     // TODO should be generated automatically
     const ENCODINGS: &'static [EncodingRef] = &[
-        ERROR,
         ASCII,
         IBM866,
         ISO_8859_1,
