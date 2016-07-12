@@ -238,7 +238,9 @@ pub mod codec {
 
 pub mod all;
 pub mod label;
+
 mod compat;
+pub use self::compat::{from_encoding_rs, to_encoding_rs};
 
 #[cfg(test)]
 mod tests {

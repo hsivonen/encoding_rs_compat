@@ -22,6 +22,7 @@ use types::ByteWriter;
 use types::StringWriter;
 use types::CodecError;
 use types::EncodingRef;
+use all;
 
 const DECODER_BUFFER_LENGTH: usize = 200;
 
@@ -208,13 +209,38 @@ impl RawEncoder for RawEncoderImpl {
 }
 
 pub fn from_encoding_rs(encoding: &'static encoding_rs::Encoding) -> EncodingRef {
-    // TODO
-    BIG5
+    let mut it = WRAPS.iter();
+    loop {
+        match it.next() {
+            None => unreachable!("How can an unlisted &'static encoding_rs::Encoding exist?"),
+            Some(wrap) => {
+                if wrap.encoding == encoding {
+                    // Need this intermediate binding to keep the compiler
+                    // happy.
+                    let enc: &'static EncodingWrap = wrap;
+                    return enc;
+                }
+            }
+        }
+    }
 }
 
 pub fn to_encoding_rs(encoding: EncodingRef) -> Option<&'static encoding_rs::Encoding> {
-    // TODO
-    Some(encoding_rs::BIG5)
+    let mut it = WRAPS.iter();
+    loop {
+        match it.next() {
+            None => {
+                return None;
+            }
+            Some(wrap) => {
+                let enc: &'static EncodingWrap = wrap;
+                let enc_ref: EncodingRef = enc;
+                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
+                    return Some(wrap.encoding);
+                }
+            }
+        }
+    }
 }
 
 pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
@@ -224,6 +250,48 @@ pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
         Some(encoding) => Some(from_encoding_rs(encoding)),
     }
 }
+
+/// All `EncodingWrap` objects in guestimatic order of frequency of usage.
+static WRAPS: [&'static EncodingWrap; 40] = [UTF_8,
+                                             WINDOWS_1252,
+                                             GBK,
+                                             SHIFT_JIS,
+                                             BIG5,
+                                             EUC_KR,
+                                             EUC_JP,
+                                             GB18030,
+                                             WINDOWS_1250,
+                                             WINDOWS_1251,
+                                             WINDOWS_1253,
+                                             WINDOWS_1254,
+                                             WINDOWS_1255,
+                                             WINDOWS_1256,
+                                             WINDOWS_1257,
+                                             WINDOWS_1258,
+                                             WINDOWS_874,
+                                             ISO_8859_2,
+                                             ISO_8859_15,
+                                             IBM866,
+                                             KOI8_R,
+                                             KOI8_U,
+                                             ISO_8859_3,
+                                             ISO_8859_4,
+                                             ISO_8859_5,
+                                             ISO_8859_6,
+                                             ISO_8859_7,
+                                             ISO_8859_8,
+                                             X_MAC_CYRILLIC,
+                                             REPLACEMENT,
+                                             ISO_2022_JP,
+                                             ISO_8859_8_I,
+                                             X_USER_DEFINED,
+                                             UTF_16BE,
+                                             UTF_16LE,
+                                             MACINTOSH,
+                                             ISO_8859_10,
+                                             ISO_8859_13,
+                                             ISO_8859_14,
+                                             ISO_8859_16];
 
 // BEGIN GENERATED CODE. PLEASE DO NOT EDIT.
 // Instead, please regenerate using generate_constants.py
