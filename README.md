@@ -17,3 +17,9 @@ functionality.
 
 * The HZ, ISO-8859-1 as an encoding distinct from windows-1252 and the error
   encoding are not supported.
+
+* The types of the constants in `all::*` differ.
+
+* There is no direct access to the indices.
+
+* Except for the types for ASCII, there are no public types under `codec`.

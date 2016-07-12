@@ -6,10 +6,12 @@
 
 use all;
 use types::EncodingRef;
+use compat;
 
 /// Returns an encoding from given label, defined in the WHATWG Encoding standard, if any.
 /// Implements "get an encoding" algorithm: http://encoding.spec.whatwg.org/#concept-encoding-get
 pub fn encoding_from_whatwg_label(label: &str) -> Option<EncodingRef> {
+    compat::encoding_rs_for_label(label)
 }
 
 /// Returns an encoding from Windows code page number.

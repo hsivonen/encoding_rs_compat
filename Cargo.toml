@@ -15,6 +15,9 @@ license = "MIT"
 [lib]
 name = "encoding"
 
+[dependencies]
+encoding_rs = { path = "../encoding_rs" }
+
 [dev-dependencies]
 getopts = "*" # for examples
 

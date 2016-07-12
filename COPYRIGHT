@@ -11,8 +11,8 @@ The original rust-encoding is under the MIT license (see LICENSE.txt) with
 the copyright notice:
 Copyright (c) 2013, Kang Seonghoon.
 
-The modifications to rust-encoding are Copyright 2016 Mozilla Foundation and
-are licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+The modifications to rust-encoding are Copyright 2013-2016 Mozilla Foundation
+and are licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 https://www.apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE.txt or
 https://opensource.org/licenses/MIT>, at your option. Contributions to
 encoding_rs_compat must be MIT/Apache 2.0 dual-licensed; see CONTRIBUTING.md.

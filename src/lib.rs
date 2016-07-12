@@ -215,12 +215,6 @@ Whenever in doubt, look at the source code and specifications for detailed expla
 
 #![cfg_attr(test, feature(test))] // lib stability features as per RFC #507
 
-extern crate encoding_index_singlebyte as index_singlebyte;
-extern crate encoding_index_korean as index_korean;
-extern crate encoding_index_japanese as index_japanese;
-extern crate encoding_index_simpchinese as index_simpchinese;
-extern crate encoding_index_tradchinese as index_tradchinese;
-
 #[cfg(test)] extern crate test;
 
 pub use self::types::{CodecError, ByteWriter, StringWriter,
@@ -235,7 +229,6 @@ pub mod types;
 
 /// Codec implementations.
 pub mod codec {
-    pub mod error;
     pub mod ascii;
     pub mod singlebyte;
     pub mod utf_8;
@@ -244,11 +237,11 @@ pub mod codec {
     pub mod japanese;
     pub mod simpchinese;
     pub mod tradchinese;
-    pub mod whatwg;
 }
 
 pub mod all;
 pub mod label;
+mod compat;
 
 #[cfg(test)]
 mod tests {
