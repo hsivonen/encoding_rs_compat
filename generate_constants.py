@@ -148,6 +148,5 @@ pub const %s: &'static compat::EncodingWrap = compat::%s;
 all_file.write(all_rs_end)
 all_file.close()
 
-
-# subprocess.call(["cargo", "fmt"])
+subprocess.call(["cargo", "fmt"])
 
