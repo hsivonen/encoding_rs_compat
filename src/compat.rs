@@ -243,8 +243,13 @@ pub fn to_encoding_rs(encoding: EncodingRef) -> Option<&'static encoding_rs::Enc
             Some(wrap) => {
                 let enc: &'static EncodingWrap = wrap;
                 let enc_ref: EncodingRef = enc;
-                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
-                    return Some(wrap.encoding);
+//                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
+//                    return Some(wrap.encoding);
+//                }
+        // Compare by name rather than by pointer pending an answer to
+        // https://users.rust-lang.org/t/how-to-expose-a-static-reference-and-an-unmangled-static-pointer-to-the-same-memory-location/6529
+                if enc_ref.whatwg_name() == encoding.whatwg_name() {
+                    return Some(wrap.encoding)
                 }
             }
         }
