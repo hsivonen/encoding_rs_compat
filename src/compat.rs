@@ -111,9 +111,8 @@ impl RawDecoder for RawDecoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut StringWriter) -> Option<CodecError> {
-        let dummy: [u8; 0] = [0; 0];
         let (result, read, written) = self.decoder
-            .decode_to_utf8_without_replacement(&dummy[0..0], &mut self.buffer[..], true);
+            .decode_to_utf8_without_replacement(b"", &mut self.buffer[..], true);
         let as_str: &str = unsafe { ::std::mem::transmute(&self.buffer[..written]) };
         output.write_str(as_str);
         match result {
