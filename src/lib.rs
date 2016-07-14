@@ -255,12 +255,12 @@ mod tests {
         }
 
         test_one(&[0xEF, 0xBB, 0xBF, 0xC3, 0xA9], "é", "utf-8");
-        test_one(&[0xC3, 0xA9], "Ã©", "iso-8859-1");
+        test_one(&[0xC3, 0xA9], "Ã©", "windows-1252");
 
         test_one(&[0xFE, 0xFF, 0x00, 0xE9], "é", "utf-16be");
-        test_one(&[0x00, 0xE9], "\x00é", "iso-8859-1");
+        test_one(&[0x00, 0xE9], "\x00é", "windows-1252");
 
         test_one(&[0xFF, 0xFE, 0xE9, 0x00], "é", "utf-16le");
-        test_one(&[0xE9, 0x00], "é\x00", "iso-8859-1");
+        test_one(&[0xE9, 0x00], "é\x00", "windows-1252");
     }
 }
