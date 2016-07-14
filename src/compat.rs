@@ -264,7 +264,7 @@ pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
     }
 }
 
-/// All `EncodingWrap` objects in guestimatic order of frequency of usage.
+/// All `EncodingWrap` objects in guestimated order of frequency of usage.
 static WRAPS: [&'static EncodingWrap; 40] = [UTF_8,
                                              WINDOWS_1252,
                                              GBK,
