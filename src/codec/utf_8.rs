@@ -28,6 +28,35 @@ use std::{str, mem};
 use std::convert::Into;
 use types::*;
 
+/// Almost equivalent to `std::str::from_utf8`.
+/// This function is provided for the fair benchmark against the stdlib's UTF-8 conversion
+/// functions, as rust-encoding always allocates a new string.
+pub fn from_utf8<'a>(input: &'a [u8]) -> Option<&'a str> {
+    let mut iter = input.iter();
+    let mut state;
+
+    macro_rules! return_as_whole(() => (return Some(unsafe {mem::transmute(input)})));
+
+    // optimization: if we are in the initial state, quickly skip to the first non-MSB-set byte.
+    loop {
+        match iter.next() {
+            Some(&ch) if ch < 0x80 => {}
+            Some(&ch) => {
+                state = next_state!(INITIAL_STATE, ch);
+                break;
+            }
+            None => { return_as_whole!(); }
+        }
+    }
+
+    for &ch in iter {
+        state = next_state!(state, ch);
+        if is_reject_state!(state) { return None; }
+    }
+    if state != ACCEPT_STATE { return None; }
+    return_as_whole!();
+}
+
 #[cfg(test)]
 mod tests {
     // portions of these tests are adopted from Markus Kuhn's UTF-8 decoder capability and
