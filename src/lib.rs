@@ -36,9 +36,9 @@
 //!
 //! ~~~~ {.rust}
 //! use encoding::{Encoding, EncoderTrap};
-//! use encoding::all::ISO_8859_1;
+//! use encoding::all::WINDOWS_1252;
 //!
-//! assert_eq!(ISO_8859_1.encode("caf\u{e9}", EncoderTrap::Strict),
+//! assert_eq!(WINDOWS_1252.encode("caf\u{e9}", EncoderTrap::Strict),
 //! Ok(vec![99,97,102,233]));
 //! ~~~~
 //!
@@ -61,9 +61,9 @@
 //!
 //! ~~~~ {.rust}
 //! use encoding::{Encoding, DecoderTrap};
-//! use encoding::all::ISO_8859_1;
+//! use encoding::all::WINDOWS_1252;
 //!
-//! assert_eq!(ISO_8859_1.decode(&[99,97,102,233], DecoderTrap::Strict),
+//! assert_eq!(WINDOWS_1252.decode(&[99,97,102,233], DecoderTrap::Strict),
 //! Ok("caf\u{e9}".to_string()));
 //! ~~~~
 //!
@@ -103,7 +103,7 @@
 //! use encoding::types::RawEncoder;
 //! use encoding::all::ASCII;
 //!
-//! hexadecimal numeric character reference replacement
+//! // hexadecimal numeric character reference replacement
 //! fn hex_ncr_escape(_encoder: &mut RawEncoder, input: &str, output: &mut ByteWriter) -> bool {
 //! let escapes: Vec<String> =
 //! input.chars().map(|ch| format!("&#x{:x};", ch as isize)).collect();
@@ -133,7 +133,7 @@
 //! assert_eq!(euckr.decode(broken, DecoderTrap::Replace),
 //! Ok("\u{c6b0}\u{c640}\u{fffd}\u{c559}".to_string()));
 //!
-//! corresponding Encoding native API:
+//! // corresponding Encoding native API:
 //! assert_eq!(WINDOWS_949.decode(broken, DecoderTrap::Replace),
 //! Ok("\u{c6b0}\u{c640}\u{fffd}\u{c559}".to_string()));
 //! ~~~~
