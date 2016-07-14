@@ -4,18 +4,13 @@
 
 //! UTF-16.
 
-use std::convert::Into;
-use std::marker::PhantomData;
-use util::as_char;
-use types::*;
-
 #[cfg(test)]
 mod tests {
     // little endian and big endian is symmetric to each other, there's no need to test both.
     // since big endian is easier to inspect we test UTF_16BE only.
 
-    use super::UTF_16BE_ENCODING as UTF_16BE;
     use types::*;
+    use all::UTF_16BE;
 
     #[test]
     fn test_encoder_valid() {

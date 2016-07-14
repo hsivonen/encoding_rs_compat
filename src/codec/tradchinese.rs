@@ -4,17 +4,15 @@
 
 //! Legacy traditional Chinese encodings.
 
-use std::convert::Into;
-use std::default::Default;
-use util::StrCharIndex;
-use types::*;
-
 #[cfg(test)]
 mod bigfive2003_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::BigFive2003Encoding;
     use testutils;
     use types::*;
+    use all;
+
+    const BigFive2003Encoding: EncodingRef = all::BIG5_2003;
 
     #[test]
     fn test_encoder_valid() {
@@ -124,6 +122,7 @@ mod bigfive2003_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::TRADITIONAL_CHINESE_TEXT;
@@ -135,6 +134,7 @@ mod bigfive2003_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT, EncoderTrap::Strict)

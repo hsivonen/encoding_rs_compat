@@ -4,17 +4,15 @@
 
 //! Legacy Japanese encodings based on JIS X 0208 and JIS X 0212.
 
-use std::convert::Into;
-use std::default::Default;
-use util::StrCharIndex;
-use types::*;
-
 #[cfg(test)]
 mod eucjp_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::EUCJPEncoding;
     use testutils;
     use types::*;
+    use all;
+
+    const EUCJPEncoding: EncodingRef = all::EUC_JP;
 
     #[test]
     fn test_encoder_valid() {
@@ -248,6 +246,7 @@ mod eucjp_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -259,6 +258,7 @@ mod eucjp_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = EUCJPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
@@ -275,10 +275,13 @@ mod eucjp_tests {
 
 #[cfg(test)]
 mod windows31j_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::Windows31JEncoding;
     use testutils;
     use types::*;
+    use all;
+
+    const Windows31JEncoding: EncodingRef = all::WINDOWS_31J;
 
     #[test]
     fn test_encoder_valid() {
@@ -443,6 +446,7 @@ mod windows31j_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -454,6 +458,7 @@ mod windows31j_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows31JEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
@@ -470,10 +475,13 @@ mod windows31j_tests {
 
 #[cfg(test)]
 mod iso2022jp_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::ISO2022JPEncoding;
     use testutils;
     use types::*;
+    use all;
+
+    const ISO2022JPEncoding: EncodingRef = all::ISO_2022_JP;
 
     #[test]
     fn test_encoder_valid() {
@@ -802,6 +810,7 @@ mod iso2022jp_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -813,6 +822,7 @@ mod iso2022jp_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = ISO2022JPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)

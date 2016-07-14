@@ -4,17 +4,15 @@
 
 //! Legacy Korean encodings based on KS X 1001.
 
-use std::convert::Into;
-use std::default::Default;
-use util::StrCharIndex;
-use types::*;
-
 #[cfg(test)]
 mod windows949_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::Windows949Encoding;
     use testutils;
     use types::*;
+    use all;
+
+    const Windows949Encoding: EncodingRef = all::WINDOWS_949;
 
     #[test]
     fn test_encoder_valid() {
@@ -138,6 +136,7 @@ mod windows949_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::KOREAN_TEXT;
@@ -149,6 +148,7 @@ mod windows949_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows949Encoding.encode(testutils::KOREAN_TEXT, EncoderTrap::Strict)

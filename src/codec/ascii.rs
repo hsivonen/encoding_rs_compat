@@ -120,6 +120,7 @@ impl RawDecoder for ASCIIDecoder {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(nightly)]
     extern crate test;
     use super::ASCIIEncoding;
     use testutils;
@@ -147,6 +148,7 @@ mod tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode(bencher: &mut test::Bencher) {
         let s = testutils::ASCII_TEXT;
@@ -158,6 +160,7 @@ mod tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode(bencher: &mut test::Bencher) {
         let s = testutils::ASCII_TEXT.as_bytes();
@@ -169,6 +172,7 @@ mod tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_replace(bencher: &mut test::Bencher) {
         let s = testutils::KOREAN_TEXT;
@@ -180,6 +184,7 @@ mod tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_replace(bencher: &mut test::Bencher) {
         let s = testutils::KOREAN_TEXT.as_bytes();

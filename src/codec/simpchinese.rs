@@ -4,18 +4,15 @@
 
 //! Legacy simplified Chinese encodings based on GB 2312 and GB 18030.
 
-use std::convert::Into;
-use std::marker::PhantomData;
-use std::default::Default;
-use util::StrCharIndex;
-use types::*;
-
 #[cfg(test)]
 mod gb18030_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::GB18030_ENCODING;
     use testutils;
     use types::*;
+    use all;
+
+    const GB18030_ENCODING: EncodingRef = all::GB18030;
 
     #[test]
     fn test_encoder() {
@@ -174,6 +171,7 @@ mod gb18030_tests {
         assert_finish_ok!(d, "");
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;
@@ -185,6 +183,7 @@ mod gb18030_tests {
         })
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = GB18030_ENCODING.encode(testutils::SIMPLIFIED_CHINESE_TEXT, EncoderTrap::Strict)
@@ -201,10 +200,13 @@ mod gb18030_tests {
 
 #[cfg(test)]
 mod gbk_tests {
+    #[cfg(nightly)]
     extern crate test;
-    use super::GBK_ENCODING;
     use testutils;
     use types::*;
+    use all;
+
+    const GBK_ENCODING: EncodingRef = all::GBK;
 
     // GBK and GB 18030 share the same decoder logic.
 
@@ -235,6 +237,7 @@ mod gbk_tests {
         assert_finish_ok!(e, []);
     }
 
+    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;
