@@ -174,8 +174,17 @@ impl RawEncoder for RawEncoderImpl {
                     continue;
                 }
                 EncoderResult::Unmappable(_) => {
-                    // TODO: Figure out the exact semantics of `upto`.
-                    return (total_read,
+                    // Move back until we find a UTF-8 sequence boundary.
+                    // Note: This is a spec violation when the ISO-2022-JP
+                    // encoder reports Basic Latin code points as unmappables
+                    // with U+FFFD. The `RawEncoder` cannot represent that
+                    // case in a spec-compliant manner.
+                    let bytes = input.as_bytes();
+                    let mut char_start = total_read - 1;
+                    while (bytes[char_start] & 0xC0) == 0x80 {
+                        char_start -= 1;
+                    }
+                    return (char_start,
                             Some(CodecError {
                         upto: total_read as isize,
                         cause: "unrepresentable character".into(),
