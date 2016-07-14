@@ -306,7 +306,7 @@ pub const BIG5: &'static EncodingWrap = &EncodingWrap {
 pub const EUC_JP: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::EUC_JP,
     whatwg_name: "euc-jp",
-    name: "EUC-JP",
+    name: "euc-jp",
 };
 
 /// The EUC-KR encoding.
@@ -320,126 +320,126 @@ pub const EUC_KR: &'static EncodingWrap = &EncodingWrap {
 pub const GBK: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::GBK,
     whatwg_name: "gbk",
-    name: "GBK",
+    name: "gbk",
 };
 
 /// The IBM866 encoding.
 pub const IBM866: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::IBM866,
     whatwg_name: "ibm866",
-    name: "IBM866",
+    name: "ibm866",
 };
 
 /// The ISO-2022-JP encoding.
 pub const ISO_2022_JP: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_2022_JP,
     whatwg_name: "iso-2022-jp",
-    name: "ISO-2022-JP",
+    name: "iso-2022-jp",
 };
 
 /// The ISO-8859-10 encoding.
 pub const ISO_8859_10: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_10,
     whatwg_name: "iso-8859-10",
-    name: "ISO-8859-10",
+    name: "iso-8859-10",
 };
 
 /// The ISO-8859-13 encoding.
 pub const ISO_8859_13: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_13,
     whatwg_name: "iso-8859-13",
-    name: "ISO-8859-13",
+    name: "iso-8859-13",
 };
 
 /// The ISO-8859-14 encoding.
 pub const ISO_8859_14: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_14,
     whatwg_name: "iso-8859-14",
-    name: "ISO-8859-14",
+    name: "iso-8859-14",
 };
 
 /// The ISO-8859-15 encoding.
 pub const ISO_8859_15: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_15,
     whatwg_name: "iso-8859-15",
-    name: "ISO-8859-15",
+    name: "iso-8859-15",
 };
 
 /// The ISO-8859-16 encoding.
 pub const ISO_8859_16: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_16,
     whatwg_name: "iso-8859-16",
-    name: "ISO-8859-16",
+    name: "iso-8859-16",
 };
 
 /// The ISO-8859-2 encoding.
 pub const ISO_8859_2: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_2,
     whatwg_name: "iso-8859-2",
-    name: "ISO-8859-2",
+    name: "iso-8859-2",
 };
 
 /// The ISO-8859-3 encoding.
 pub const ISO_8859_3: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_3,
     whatwg_name: "iso-8859-3",
-    name: "ISO-8859-3",
+    name: "iso-8859-3",
 };
 
 /// The ISO-8859-4 encoding.
 pub const ISO_8859_4: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_4,
     whatwg_name: "iso-8859-4",
-    name: "ISO-8859-4",
+    name: "iso-8859-4",
 };
 
 /// The ISO-8859-5 encoding.
 pub const ISO_8859_5: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_5,
     whatwg_name: "iso-8859-5",
-    name: "ISO-8859-5",
+    name: "iso-8859-5",
 };
 
 /// The ISO-8859-6 encoding.
 pub const ISO_8859_6: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_6,
     whatwg_name: "iso-8859-6",
-    name: "ISO-8859-6",
+    name: "iso-8859-6",
 };
 
 /// The ISO-8859-7 encoding.
 pub const ISO_8859_7: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_7,
     whatwg_name: "iso-8859-7",
-    name: "ISO-8859-7",
+    name: "iso-8859-7",
 };
 
 /// The ISO-8859-8 encoding.
 pub const ISO_8859_8: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_8,
     whatwg_name: "iso-8859-8",
-    name: "ISO-8859-8",
+    name: "iso-8859-8",
 };
 
 /// The ISO-8859-8-I encoding.
 pub const ISO_8859_8_I: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::ISO_8859_8_I,
     whatwg_name: "iso-8859-8-i",
-    name: "ISO-8859-8-I",
+    name: "iso-8859-8-i",
 };
 
 /// The KOI8-R encoding.
 pub const KOI8_R: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::KOI8_R,
     whatwg_name: "koi8-r",
-    name: "KOI8-R",
+    name: "koi8-r",
 };
 
 /// The KOI8-U encoding.
 pub const KOI8_U: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::KOI8_U,
     whatwg_name: "koi8-u",
-    name: "KOI8-U",
+    name: "koi8-u",
 };
 
 /// The Shift_JIS encoding.
@@ -453,21 +453,21 @@ pub const SHIFT_JIS: &'static EncodingWrap = &EncodingWrap {
 pub const UTF_16BE: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::UTF_16BE,
     whatwg_name: "utf-16be",
-    name: "UTF-16BE",
+    name: "utf-16be",
 };
 
 /// The UTF-16LE encoding.
 pub const UTF_16LE: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::UTF_16LE,
     whatwg_name: "utf-16le",
-    name: "UTF-16LE",
+    name: "utf-16le",
 };
 
 /// The UTF-8 encoding.
 pub const UTF_8: &'static EncodingWrap = &EncodingWrap {
     encoding: encoding_rs::UTF_8,
     whatwg_name: "utf-8",
-    name: "UTF-8",
+    name: "utf-8",
 };
 
 /// The gb18030 encoding.

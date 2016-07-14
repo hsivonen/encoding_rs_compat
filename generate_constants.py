@@ -68,7 +68,7 @@ def to_whatwg_name(name):
 def to_rust_encoding_name(name):
   if NAMES_TO_RUST_ENCODING.has_key(name):
     return NAMES_TO_RUST_ENCODING[name]
-  return name
+  return name.lower()
 
 # rust-encoding constant name
 def to_rust_encoding_constant_name(name):
