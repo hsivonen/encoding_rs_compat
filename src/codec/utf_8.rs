@@ -33,7 +33,7 @@ extern crate encoding_rs;
 pub fn from_utf8<'a>(input: &'a [u8]) -> Option<&'a str> {
     // encoding_rs needs an output buffer, so the purpose of this function is
     // somewhat defeated.
-    let mut buffer = [0u8; 124400];
+    let mut buffer: [u8; 124400] = unsafe { ::std::mem::uninitialized() };
     let mut decoder = encoding_rs::UTF_8.new_decoder_without_bom_handling();
     let (result, _, _) = decoder.decode_to_utf8_without_replacement(input, &mut buffer[..], true);
     match result {

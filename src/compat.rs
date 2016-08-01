@@ -24,9 +24,9 @@ use types::CodecError;
 use types::EncodingRef;
 use all;
 
-const DECODER_BUFFER_LENGTH: usize = 200;
+const DECODER_BUFFER_LENGTH: usize = 1024;
 
-const ENCODER_BUFFER_LENGTH: usize = 200;
+const ENCODER_BUFFER_LENGTH: usize = 1024;
 
 pub struct EncodingWrap {
     /// The wrapped encoding_rs `Encoding`
@@ -57,39 +57,37 @@ impl types::Encoding for EncodingWrap {
     }
 }
 
-struct RawDecoderImpl {
-    decoder: Decoder,
-    buffer: [u8; DECODER_BUFFER_LENGTH],
-}
+struct RawDecoderImpl(Decoder);
 
 impl RawDecoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawDecoderImpl {
-        RawDecoderImpl {
-            decoder: encoding.new_decoder_without_bom_handling(),
-            buffer: [0; DECODER_BUFFER_LENGTH],
-        }
+        RawDecoderImpl(encoding.new_decoder_without_bom_handling())
     }
 }
 
 impl RawDecoder for RawDecoderImpl {
     fn from_self(&self) -> Box<RawDecoder> {
-        Box::new(RawDecoderImpl::new(self.decoder.encoding()))
+        let &RawDecoderImpl(ref decoder) = self;
+        Box::new(RawDecoderImpl::new(decoder.encoding()))
     }
 
     fn is_ascii_compatible(&self) -> bool {
-        self.decoder.encoding().is_ascii_compatible()
+        let &RawDecoderImpl(ref decoder) = self;
+        decoder.encoding().is_ascii_compatible()
     }
 
     fn raw_feed(&mut self, input: &[u8], output: &mut StringWriter) -> (usize, Option<CodecError>) {
-        output.writer_hint(self.decoder.max_utf8_buffer_length_without_replacement(input.len()));
+        let &mut RawDecoderImpl(ref mut decoder) = self;
+        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
         let mut total_read = 0usize;
         loop {
-            let (result, read, written) = self.decoder
-                .decode_to_utf8_without_replacement(&input[total_read..],
-                                                    &mut self.buffer[..],
-                                                    false);
+            let (result, read, written) =
+                decoder.decode_to_utf8_without_replacement(&input[total_read..],
+                                                           &mut buffer[..],
+                                                           false);
             total_read += read;
-            let as_str: &str = unsafe { ::std::mem::transmute(&self.buffer[..written]) };
+            let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
             output.write_str(as_str);
             match result {
                 DecoderResult::InputEmpty => {
@@ -111,9 +109,11 @@ impl RawDecoder for RawDecoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut StringWriter) -> Option<CodecError> {
-        let (result, read, written) = self.decoder
-            .decode_to_utf8_without_replacement(b"", &mut self.buffer[..], true);
-        let as_str: &str = unsafe { ::std::mem::transmute(&self.buffer[..written]) };
+        let &mut RawDecoderImpl(ref mut decoder) = self;
+        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let (result, read, written) =
+            decoder.decode_to_utf8_without_replacement(b"", &mut buffer[..], true);
+        let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
         output.write_str(as_str);
         match result {
             DecoderResult::InputEmpty => {
@@ -133,39 +133,37 @@ impl RawDecoder for RawDecoderImpl {
     }
 }
 
-struct RawEncoderImpl {
-    encoder: Encoder,
-    buffer: [u8; ENCODER_BUFFER_LENGTH],
-}
+struct RawEncoderImpl(Encoder);
 
 impl RawEncoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawEncoderImpl {
-        RawEncoderImpl {
-            encoder: encoding.new_encoder(),
-            buffer: [0; ENCODER_BUFFER_LENGTH],
-        }
+        RawEncoderImpl(encoding.new_encoder())
     }
 }
 
 impl RawEncoder for RawEncoderImpl {
     fn from_self(&self) -> Box<RawEncoder> {
-        Box::new(RawEncoderImpl::new(self.encoder.encoding()))
+        let &RawEncoderImpl(ref encoder) = self;
+        Box::new(RawEncoderImpl::new(encoder.encoding()))
     }
 
     fn is_ascii_compatible(&self) -> bool {
-        self.encoder.encoding().is_ascii_compatible()
+        let &RawEncoderImpl(ref encoder) = self;
+        encoder.encoding().is_ascii_compatible()
     }
 
     fn raw_feed(&mut self, input: &str, output: &mut ByteWriter) -> (usize, Option<CodecError>) {
-        output.writer_hint(self.encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        let &mut RawEncoderImpl(ref mut encoder) = self;
+        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
         let mut total_read = 0usize;
         loop {
-            let (result, read, written) = self.encoder
-                .encode_from_utf8_without_replacement(&input[total_read..],
-                                                      &mut self.buffer[..],
-                                                      false);
+            let (result, read, written) =
+                encoder.encode_from_utf8_without_replacement(&input[total_read..],
+                                                             &mut buffer[..],
+                                                             false);
             total_read += read;
-            output.write_bytes(&self.buffer[..written]);
+            output.write_bytes(&buffer[..written]);
             match result {
                 EncoderResult::InputEmpty => {
                     return (total_read, None);
@@ -195,9 +193,11 @@ impl RawEncoder for RawEncoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut ByteWriter) -> Option<CodecError> {
-        let (result, read, written) = self.encoder
-            .encode_from_utf8_without_replacement("", &mut self.buffer[..], false);
-        output.write_bytes(&self.buffer[..written]);
+        let &mut RawEncoderImpl(ref mut encoder) = self;
+        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let (result, read, written) =
+            encoder.encode_from_utf8_without_replacement("", &mut buffer[..], false);
+        output.write_bytes(&buffer[..written]);
         match result {
             EncoderResult::InputEmpty => {
                 return None;
