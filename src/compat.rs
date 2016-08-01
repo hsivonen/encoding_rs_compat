@@ -39,6 +39,31 @@ pub struct EncodingWrap {
     name: &'static str,
 }
 
+fn encode_char(c: char, buffer: &mut [u8; 4]) -> &str {
+    let u = c as u32;
+    let len = if u <= 0x7F {
+        buffer[0] = u as u8;
+        1usize
+    } else if u <= 0x0800 {
+        buffer[0] = ((u >> 6) | 0xC0u32) as u8;
+        buffer[1] = ((u & 0x3Fu32) | 0x80u32) as u8;
+        2usize
+    } else if u <= 0xFFFF {
+        buffer[0] = ((u >> 12) | 0xE0u32) as u8;
+        buffer[1] = (((u & 0xFC0u32) >> 6) | 0x80u32) as u8;
+        buffer[2] = ((u & 0x3Fu32) | 0x80u32) as u8;
+        3usize
+    } else {
+        buffer[0] = ((u >> 18) | 0xF0u32) as u8;
+        buffer[1] = (((u & 0x3F000u32) >> 12) | 0x80u32) as u8;
+        buffer[2] = (((u & 0xFC0u32) >> 6) | 0x80u32) as u8;
+        buffer[3] = ((u & 0x3Fu32) | 0x80u32) as u8;
+        4usize
+    };
+    let slice = &buffer[..len];
+    unsafe { ::std::mem::transmute(slice) }
+}
+
 impl types::Encoding for EncodingWrap {
     fn name(&self) -> &'static str {
         return self.name;
@@ -68,6 +93,52 @@ impl types::Encoding for EncodingWrap {
             }
         }
     }
+
+    fn encode_to(&self,
+                 input: &str,
+                 trap: EncoderTrap,
+                 output: &mut ByteWriter)
+                 -> Result<(), Cow<'static, str>> {
+        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let mut unmappable_buffer = [0u8; 4];
+        let mut raw_encoder = RawEncoderImpl::new(self.encoding);
+        let mut total_read = 0usize;
+        {
+            let RawEncoderImpl(ref mut encoder) = raw_encoder;
+            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        }
+        loop {
+            let result = {
+                let RawEncoderImpl(ref mut encoder) = raw_encoder;
+                let (result, read, written) =
+                    encoder.encode_from_utf8_without_replacement(&input[total_read..],
+                                                                 &mut buffer[..],
+                                                                 true);
+                total_read += read;
+                output.write_bytes(&buffer[..written]);
+                result
+            };
+            match result {
+                EncoderResult::InputEmpty => {
+                    return Ok(());
+                }
+                EncoderResult::OutputFull => {
+                    continue;
+                }
+                EncoderResult::Unmappable(c) => {
+                    if trap.trap(&mut raw_encoder,
+                                 encode_char(c, &mut unmappable_buffer),
+                                 output) {
+                        continue;
+                    } else {
+                        return Err("unrepresentable character".into());
+                    }
+                }
+            }
+        }
+
+    }
+
 
     fn decode(&self, input: &[u8], trap: DecoderTrap) -> Result<String, Cow<'static, str>> {
         match trap {
