@@ -55,6 +55,32 @@ impl types::Encoding for EncodingWrap {
     fn raw_decoder(&self) -> Box<RawDecoder> {
         Box::new(RawDecoderImpl::new(self.encoding))
     }
+
+    fn encode(&self, input: &str, trap: EncoderTrap) -> Result<Vec<u8>, Cow<'static, str>> {
+        match trap {
+            EncoderTrap::NcrEscape => {
+                let (out, _, _) = self.encoding.encode(input);
+                return Ok(out);
+            }
+            _ => {
+                let mut out = Vec::new();
+                return self.encode_to(input, trap, &mut out).map(|_| out);
+            }
+        }
+    }
+
+    fn decode(&self, input: &[u8], trap: DecoderTrap) -> Result<String, Cow<'static, str>> {
+        match trap {
+            DecoderTrap::Replace => {
+                let (out, _) = self.encoding.decode_without_bom_handling(input);
+                return Ok(out);
+            }
+            _ => {
+                let mut out = String::new();
+                return self.decode_to(input, trap, &mut out).map(|_| out);
+            }
+        }
+    }
 }
 
 /// Result of a (potentially partial) decode operation without replacement.
@@ -121,7 +147,7 @@ impl RawDecoderImpl {
     fn raw_finish_impl(&mut self, output: &mut StringWriter) -> RawDecoderResult {
         let &mut RawDecoderImpl(ref mut decoder) = self;
         let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        let (result, read, written) =
+        let (result, _, written) =
             decoder.decode_to_utf8_without_replacement(b"", &mut buffer[..], true);
         let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
         output.write_str(as_str);
