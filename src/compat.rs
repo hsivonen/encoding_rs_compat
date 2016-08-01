@@ -57,11 +57,85 @@ impl types::Encoding for EncodingWrap {
     }
 }
 
+/// Result of a (potentially partial) decode operation without replacement.
+#[derive(Debug)]
+enum RawDecoderResult {
+    /// The input was exhausted.
+    ///
+    /// If this result was returned from a call where `last` was `true`, the
+    /// decoding process has completed. Otherwise, the caller should call a
+    /// decode method again with more input.
+    Done,
+
+    /// The decoder encountered a malformed byte sequence.
+    ///
+    /// The caller must either treat this as a fatal error or must append one
+    /// REPLACEMENT CHARACTER (U+FFFD) to the output and then re-push the
+    /// the remaining input to the decoder.
+    ///
+    /// The first wrapped integer indicates the length of the malformed byte
+    /// sequence. The second wrapped integer indicates the number of bytes
+    /// that were consumed after the malformed sequence. If the second
+    /// integer is zero, the last byte that was consumed is the last byte of
+    /// the malformed sequence. Note that the malformed bytes may have been part
+    /// of an earlier input buffer.
+    Malformed(u8, u8), // u8 instead of usize to avoid useless bloat
+}
+
 struct RawDecoderImpl(Decoder);
 
 impl RawDecoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawDecoderImpl {
         RawDecoderImpl(encoding.new_decoder_without_bom_handling())
+    }
+
+    fn raw_feed_impl(&mut self,
+                     input: &[u8],
+                     output: &mut StringWriter)
+                     -> (usize, RawDecoderResult) {
+        let &mut RawDecoderImpl(ref mut decoder) = self;
+        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let mut total_read = 0usize;
+        loop {
+            let (result, read, written) =
+                decoder.decode_to_utf8_without_replacement(&input[total_read..],
+                                                           &mut buffer[..],
+                                                           false);
+            total_read += read;
+            let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
+            output.write_str(as_str);
+            match result {
+                DecoderResult::InputEmpty => {
+                    return (total_read, RawDecoderResult::Done);
+                }
+                DecoderResult::OutputFull => {
+                    continue;
+                }
+                DecoderResult::Malformed(bad, good) => {
+                    return (total_read, RawDecoderResult::Malformed(bad, good));
+                }
+            }
+        }
+    }
+
+    fn raw_finish_impl(&mut self, output: &mut StringWriter) -> RawDecoderResult {
+        let &mut RawDecoderImpl(ref mut decoder) = self;
+        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let (result, read, written) =
+            decoder.decode_to_utf8_without_replacement(b"", &mut buffer[..], true);
+        let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
+        output.write_str(as_str);
+        match result {
+            DecoderResult::InputEmpty => {
+                return RawDecoderResult::Done;
+            }
+            DecoderResult::OutputFull => {
+                unreachable!("No way buffer could get filled from empty input.");
+            }
+            DecoderResult::Malformed(bad, good) => {
+                return RawDecoderResult::Malformed(bad, good);
+            }
+        }
     }
 }
 
@@ -77,55 +151,38 @@ impl RawDecoder for RawDecoderImpl {
     }
 
     fn raw_feed(&mut self, input: &[u8], output: &mut StringWriter) -> (usize, Option<CodecError>) {
-        let &mut RawDecoderImpl(ref mut decoder) = self;
-        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
-        let mut total_read = 0usize;
-        loop {
-            let (result, read, written) =
-                decoder.decode_to_utf8_without_replacement(&input[total_read..],
-                                                           &mut buffer[..],
-                                                           false);
-            total_read += read;
-            let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
-            output.write_str(as_str);
-            match result {
-                DecoderResult::InputEmpty => {
-                    return (total_read, None);
-                }
-                DecoderResult::OutputFull => {
-                    continue;
-                }
-                DecoderResult::Malformed(_, _) => {
-                    // TODO: Figure out the exact semantics of `upto`.
-                    return (total_read,
-                            Some(CodecError {
-                        upto: total_read as isize,
-                        cause: "invalid sequence".into(),
-                    }));
-                }
+        {
+            let &mut RawDecoderImpl(ref mut decoder) = self;
+            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+        }
+        let (read, result) = self.raw_feed_impl(input, output);
+        match result {
+            RawDecoderResult::Done => {
+                return (read, None);
+            }
+            RawDecoderResult::Malformed(_, _) => {
+                // Report a zero-length sequence as being in error by
+                // setting `upto` to `read`.
+                return (read,
+                        Some(CodecError {
+                    upto: read as isize,
+                    cause: "invalid sequence".into(),
+                }));
             }
         }
     }
 
     fn raw_finish(&mut self, output: &mut StringWriter) -> Option<CodecError> {
-        let &mut RawDecoderImpl(ref mut decoder) = self;
-        let mut buffer: [u8; DECODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        let (result, read, written) =
-            decoder.decode_to_utf8_without_replacement(b"", &mut buffer[..], true);
-        let as_str: &str = unsafe { ::std::mem::transmute(&buffer[..written]) };
-        output.write_str(as_str);
+        let result = self.raw_finish_impl(output);
         match result {
-            DecoderResult::InputEmpty => {
+            RawDecoderResult::Done => {
                 return None;
             }
-            DecoderResult::OutputFull => {
-                unreachable!("No way buffer could get filled from empty input.");
-            }
-            DecoderResult::Malformed(_, _) => {
-                // TODO: Figure out the exact semantics of `upto`.
+            RawDecoderResult::Malformed(_, _) => {
+                // Report a zero-length sequence as being in error by
+                // setting `upto` to 0.
                 return Some(CodecError {
-                    upto: read as isize,
+                    upto: 0isize,
                     cause: "invalid sequence".into(),
                 });
             }
@@ -133,11 +190,74 @@ impl RawDecoder for RawDecoderImpl {
     }
 }
 
+/// Result of a (potentially partial) encode operation without replacement.
+#[derive(Debug)]
+enum RawEncoderResult {
+    /// The input was exhausted.
+    ///
+    /// If this result was returned from a call where `last` was `true`, the
+    /// decoding process has completed. Otherwise, the caller should call a
+    /// decode method again with more input.
+    Done,
+
+    /// The encoder encountered an unmappable character.
+    ///
+    /// The caller must either treat this as a fatal error or must append
+    /// a placeholder to the output and then re-push the the remaining input to
+    /// the encoder.
+    Unmappable(char),
+}
+
 struct RawEncoderImpl(Encoder);
 
 impl RawEncoderImpl {
     fn new(encoding: &'static encoding_rs::Encoding) -> RawEncoderImpl {
         RawEncoderImpl(encoding.new_encoder())
+    }
+
+    fn raw_feed_impl(&mut self, input: &str, output: &mut ByteWriter) -> (usize, RawEncoderResult) {
+        let &mut RawEncoderImpl(ref mut encoder) = self;
+        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        let mut total_read = 0usize;
+        loop {
+            let (result, read, written) =
+                encoder.encode_from_utf8_without_replacement(&input[total_read..],
+                                                             &mut buffer[..],
+                                                             false);
+            total_read += read;
+            output.write_bytes(&buffer[..written]);
+            match result {
+                EncoderResult::InputEmpty => {
+                    return (total_read, RawEncoderResult::Done);
+                }
+                EncoderResult::OutputFull => {
+                    continue;
+                }
+                EncoderResult::Unmappable(c) => {
+                    return (total_read, RawEncoderResult::Unmappable(c));
+                }
+            }
+        }
+    }
+
+    fn raw_finish_impl(&mut self, output: &mut ByteWriter) -> RawEncoderResult {
+        let &mut RawEncoderImpl(ref mut encoder) = self;
+        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
+        let (result, _, written) =
+            encoder.encode_from_utf8_without_replacement("", &mut buffer[..], false);
+        output.write_bytes(&buffer[..written]);
+        match result {
+            EncoderResult::InputEmpty => {
+                return RawEncoderResult::Done;
+            }
+            EncoderResult::OutputFull => {
+                unreachable!("No way buffer could get filled from empty input.");
+            }
+            EncoderResult::Unmappable(c) => {
+                return RawEncoderResult::Unmappable(c);
+            }
+        }
     }
 }
 
@@ -153,64 +273,43 @@ impl RawEncoder for RawEncoderImpl {
     }
 
     fn raw_feed(&mut self, input: &str, output: &mut ByteWriter) -> (usize, Option<CodecError>) {
-        let &mut RawEncoderImpl(ref mut encoder) = self;
-        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
-        let mut total_read = 0usize;
-        loop {
-            let (result, read, written) =
-                encoder.encode_from_utf8_without_replacement(&input[total_read..],
-                                                             &mut buffer[..],
-                                                             false);
-            total_read += read;
-            output.write_bytes(&buffer[..written]);
-            match result {
-                EncoderResult::InputEmpty => {
-                    return (total_read, None);
+        {
+            let &mut RawEncoderImpl(ref mut encoder) = self;
+            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        }
+        let (read, result) = self.raw_feed_impl(input, output);
+        match result {
+            RawEncoderResult::Done => {
+                return (read, None);
+            }
+            RawEncoderResult::Unmappable(_) => {
+                // Move back until we find a UTF-8 sequence boundary.
+                // Note: This is a spec violation when the ISO-2022-JP
+                // encoder reports Basic Latin code points as unmappables
+                // with U+FFFD. The `RawEncoder` cannot represent that
+                // case in a spec-compliant manner.
+                let bytes = input.as_bytes();
+                let mut char_start = read - 1;
+                while (bytes[char_start] & 0xC0) == 0x80 {
+                    char_start -= 1;
                 }
-                EncoderResult::OutputFull => {
-                    continue;
-                }
-                EncoderResult::Unmappable(_) => {
-                    // Move back until we find a UTF-8 sequence boundary.
-                    // Note: This is a spec violation when the ISO-2022-JP
-                    // encoder reports Basic Latin code points as unmappables
-                    // with U+FFFD. The `RawEncoder` cannot represent that
-                    // case in a spec-compliant manner.
-                    let bytes = input.as_bytes();
-                    let mut char_start = total_read - 1;
-                    while (bytes[char_start] & 0xC0) == 0x80 {
-                        char_start -= 1;
-                    }
-                    return (char_start,
-                            Some(CodecError {
-                        upto: total_read as isize,
-                        cause: "unrepresentable character".into(),
-                    }));
-                }
+                return (char_start,
+                        Some(CodecError {
+                    upto: read as isize,
+                    cause: "unrepresentable character".into(),
+                }));
             }
         }
     }
 
     fn raw_finish(&mut self, output: &mut ByteWriter) -> Option<CodecError> {
-        let &mut RawEncoderImpl(ref mut encoder) = self;
-        let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        let (result, read, written) =
-            encoder.encode_from_utf8_without_replacement("", &mut buffer[..], false);
-        output.write_bytes(&buffer[..written]);
+        let result = self.raw_finish_impl(output);
         match result {
-            EncoderResult::InputEmpty => {
+            RawEncoderResult::Done => {
                 return None;
             }
-            EncoderResult::OutputFull => {
-                unreachable!("No way buffer could get filled from empty input.");
-            }
-            EncoderResult::Unmappable(_) => {
-                // TODO: Figure out the exact semantics of `upto`.
-                return Some(CodecError {
-                    upto: read as isize,
-                    cause: "unrepresentable character".into(),
-                });
+            RawEncoderResult::Unmappable(_) => {
+                unreachable!("Encoders never report unmappables upon finish.");
             }
         }
     }
