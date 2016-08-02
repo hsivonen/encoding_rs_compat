@@ -442,7 +442,7 @@ impl RawEncoderImpl {
             dst.reserve(needed);
         }
         // encoding_rs doesn't provide
-        // encode_from_utf8_to_vec without_replacement() due to lack of use
+        // encode_from_utf8_to_vec_without_replacement() due to lack of use
         // cases, so let's inline the implementation here.
         let (result, read) = unsafe {
             let old_len = dst.len();
