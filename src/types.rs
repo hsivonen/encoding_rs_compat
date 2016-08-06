@@ -80,6 +80,12 @@ pub trait ByteWriter {
 
     /// Writes a number of bytes.
     fn write_bytes(&mut self, v: &[u8]);
+
+    /// If this `ByteWriter` is a `Vec<u8>`, returns a mutable reference to
+    /// `self` as `Some(&mut Vec<u8>)`. Returns `None` otherwise.
+    fn as_vec_mut(&mut self) -> Option<&mut Vec<u8>> {
+        None
+    }
 }
 
 impl ByteWriter for Vec<u8> {
@@ -93,6 +99,10 @@ impl ByteWriter for Vec<u8> {
 
     fn write_bytes(&mut self, v: &[u8]) {
         self.extend_from_slice(v);
+    }
+
+    fn as_vec_mut(&mut self) -> Option<&mut Vec<u8>> {
+        Some(self)
     }
 }
 
@@ -111,6 +121,12 @@ pub trait StringWriter {
 
     /// Writes a string.
     fn write_str(&mut self, s: &str);
+
+    /// If this `StringWriter` is a `String`, returns a mutable reference to
+    /// `self` as `Some(&mut String)`. Returns `None` otherwise.
+    fn as_string_mut(&mut self) -> Option<&mut String> {
+        None
+    }
 }
 
 impl StringWriter for String {
@@ -125,6 +141,10 @@ impl StringWriter for String {
 
     fn write_str(&mut self, s: &str) {
         self.push_str(s);
+    }
+
+    fn as_string_mut(&mut self) -> Option<&mut String> {
+        Some(self)
     }
 }
 
