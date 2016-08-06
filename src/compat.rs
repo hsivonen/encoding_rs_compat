@@ -97,6 +97,38 @@ impl EncodingWrap {
         }
     }
 
+    fn encode_to_writer(&self,
+                        input: &str,
+                        trap: EncoderTrap,
+                        output: &mut ByteWriter)
+                        -> Result<(), Cow<'static, str>> {
+        let mut unmappable_buffer = [0u8; 4];
+        let mut raw_encoder = RawEncoderImpl::new(self.encoding);
+        {
+            let RawEncoderImpl(ref mut encoder) = raw_encoder;
+            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        }
+        let mut total_read = 0usize;
+        loop {
+            let (result, read) = raw_encoder.encode_to_writer_without_replacement(&input[total_read..], output, true);
+            total_read += read;
+            match result {
+                RawEncoderResult::Done => {
+                    return Ok(());
+                }
+                RawEncoderResult::Unmappable(c) => {
+                    if trap.trap(&mut raw_encoder,
+                                 encode_char(c, &mut unmappable_buffer),
+                                 output) {
+                        continue;
+                    } else {
+                        return Err("unrepresentable character".into());
+                    }
+                }
+            }
+        }
+    }
+
     fn decode_to_string(&self,
                         input: &[u8],
                         trap: DecoderTrap,
@@ -110,6 +142,37 @@ impl EncodingWrap {
         let mut total_read = 0usize;
         loop {
             let (result, read) = raw_decoder.decode_to_string_without_replacement(&input[total_read..], output, true);
+            total_read += read;
+            match result {
+                RawDecoderResult::Done => {
+                    return Ok(());
+                }
+                RawDecoderResult::Malformed(bad, good) => {
+                    let end = total_read - (good as usize);
+                    let start = end - (bad as usize);
+                    if trap.trap(&mut raw_decoder, &input[start..end], output) {
+                        continue;
+                    } else {
+                        return Err("unrepresentable character".into());
+                    }
+                }
+            }
+        }
+    }
+
+    fn decode_to_writer(&self,
+                        input: &[u8],
+                        trap: DecoderTrap,
+                        output: &mut StringWriter)
+                        -> Result<(), Cow<'static, str>> {
+        let mut raw_decoder = RawDecoderImpl::new(self.encoding);
+        {
+            let RawDecoderImpl(ref mut decoder) = raw_decoder;
+            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+        }
+        let mut total_read = 0usize;
+        loop {
+            let (result, read) = raw_decoder.decode_to_writer_without_replacement(&input[total_read..], output, true);
             total_read += read;
             match result {
                 RawDecoderResult::Done => {
@@ -164,31 +227,11 @@ impl types::Encoding for EncodingWrap {
                  trap: EncoderTrap,
                  output: &mut ByteWriter)
                  -> Result<(), Cow<'static, str>> {
-        let mut unmappable_buffer = [0u8; 4];
-        let mut raw_encoder = RawEncoderImpl::new(self.encoding);
-        {
-            let RawEncoderImpl(ref mut encoder) = raw_encoder;
-            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+        match output.as_vec_mut() {
+            None => {}
+            Some(vec) => return self.encode_to_vec(input, trap, vec),
         }
-        let mut total_read = 0usize;
-        loop {
-            let (result, read) = raw_encoder.encode_to_writer_without_replacement(&input[total_read..], output, true);
-            total_read += read;
-            match result {
-                RawEncoderResult::Done => {
-                    return Ok(());
-                }
-                RawEncoderResult::Unmappable(c) => {
-                    if trap.trap(&mut raw_encoder,
-                                 encode_char(c, &mut unmappable_buffer),
-                                 output) {
-                        continue;
-                    } else {
-                        return Err("unrepresentable character".into());
-                    }
-                }
-            }
-        }
+        self.encode_to_writer(input, trap, output)
     }
 
     fn decode(&self, input: &[u8], trap: DecoderTrap) -> Result<String, Cow<'static, str>> {
@@ -209,30 +252,11 @@ impl types::Encoding for EncodingWrap {
                  trap: DecoderTrap,
                  output: &mut StringWriter)
                  -> Result<(), Cow<'static, str>> {
-        let mut raw_decoder = RawDecoderImpl::new(self.encoding);
-        {
-            let RawDecoderImpl(ref mut decoder) = raw_decoder;
-            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+        match output.as_string_mut() {
+            None => {}
+            Some(string) => return self.decode_to_string(input, trap, string),
         }
-        let mut total_read = 0usize;
-        loop {
-            let (result, read) = raw_decoder.decode_to_writer_without_replacement(&input[total_read..], output, true);
-            total_read += read;
-            match result {
-                RawDecoderResult::Done => {
-                    return Ok(());
-                }
-                RawDecoderResult::Malformed(bad, good) => {
-                    let end = total_read - (good as usize);
-                    let start = end - (bad as usize);
-                    if trap.trap(&mut raw_decoder, &input[start..end], output) {
-                        continue;
-                    } else {
-                        return Err("unrepresentable character".into());
-                    }
-                }
-            }
-        }
+        self.decode_to_writer(input, trap, output)
     }
 }
 
@@ -322,6 +346,18 @@ impl RawDecoderImpl {
             }
         }
     }
+
+    fn decode_without_replacement(&mut self,
+                                  src: &[u8],
+                                  dst: &mut StringWriter,
+                                  last: bool)
+                                  -> (RawDecoderResult, usize) {
+        match dst.as_string_mut() {
+            None => {}
+            Some(string) => return self.decode_to_string_without_replacement(src, string, last),
+        }
+        self.decode_to_writer_without_replacement(src, dst, last)
+    }
 }
 
 impl RawDecoder for RawDecoderImpl {
@@ -340,7 +376,7 @@ impl RawDecoder for RawDecoderImpl {
             let &mut RawDecoderImpl(ref mut decoder) = self;
             output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
         }
-        let (result, read) = self.decode_to_writer_without_replacement(input, output, false);
+        let (result, read) = self.decode_without_replacement(input, output, false);
         match result {
             RawDecoderResult::Done => {
                 return (read, None);
@@ -358,7 +394,7 @@ impl RawDecoder for RawDecoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut StringWriter) -> Option<CodecError> {
-        let (result, _) = self.decode_to_writer_without_replacement(b"", output, false);
+        let (result, _) = self.decode_without_replacement(b"", output, false);
         match result {
             RawDecoderResult::Done => {
                 return None;
@@ -465,6 +501,18 @@ impl RawEncoderImpl {
             }
         }
     }
+
+    fn encode_without_replacement(&mut self,
+                                  src: &str,
+                                  dst: &mut ByteWriter,
+                                  last: bool)
+                                  -> (RawEncoderResult, usize) {
+        match dst.as_vec_mut() {
+            None => {}
+            Some(vec) => return self.encode_to_vec_without_replacement(src, vec, last),
+        }
+        self.encode_to_writer_without_replacement(src, dst, last)
+    }
 }
 
 impl RawEncoder for RawEncoderImpl {
@@ -483,7 +531,7 @@ impl RawEncoder for RawEncoderImpl {
             let &mut RawEncoderImpl(ref mut encoder) = self;
             output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
         }
-        let (result, read) = self.encode_to_writer_without_replacement(input, output, false);
+        let (result, read) = self.encode_without_replacement(input, output, false);
         match result {
             RawEncoderResult::Done => {
                 return (read, None);
@@ -509,7 +557,7 @@ impl RawEncoder for RawEncoderImpl {
     }
 
     fn raw_finish(&mut self, output: &mut ByteWriter) -> Option<CodecError> {
-        let (result, _) = self.encode_to_writer_without_replacement("", output, false);
+        let (result, _) = self.encode_without_replacement("", output, false);
         match result {
             RawEncoderResult::Done => {
                 return None;
