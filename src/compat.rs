@@ -227,7 +227,7 @@ impl types::Encoding for EncodingWrap {
                  trap: EncoderTrap,
                  output: &mut ByteWriter)
                  -> Result<(), Cow<'static, str>> {
-        match output.as_vec_mut() {
+        match output.as_mut_vec() {
             None => {}
             Some(vec) => return self.encode_to_vec(input, trap, vec),
         }
@@ -252,7 +252,7 @@ impl types::Encoding for EncodingWrap {
                  trap: DecoderTrap,
                  output: &mut StringWriter)
                  -> Result<(), Cow<'static, str>> {
-        match output.as_string_mut() {
+        match output.as_mut_string() {
             None => {}
             Some(string) => return self.decode_to_string(input, trap, string),
         }
@@ -352,7 +352,7 @@ impl RawDecoderImpl {
                                   dst: &mut StringWriter,
                                   last: bool)
                                   -> (RawDecoderResult, usize) {
-        match dst.as_string_mut() {
+        match dst.as_mut_string() {
             None => {}
             Some(string) => return self.decode_to_string_without_replacement(src, string, last),
         }
@@ -507,7 +507,7 @@ impl RawEncoderImpl {
                                   dst: &mut ByteWriter,
                                   last: bool)
                                   -> (RawEncoderResult, usize) {
-        match dst.as_vec_mut() {
+        match dst.as_mut_vec() {
             None => {}
             Some(vec) => return self.encode_to_vec_without_replacement(src, vec, last),
         }
