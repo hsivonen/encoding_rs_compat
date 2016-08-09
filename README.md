@@ -23,3 +23,21 @@ functionality.
 * There is no direct access to the indices.
 
 * The `codec` module isn't visible.
+
+* `RawDecoder.raw_feed()` always identifies a zero-length byte sequence as
+  being the erroneous one. (This is due to encoding_rs not backtracking when
+  a byte sequence that might turn out to be erroneous later is split across
+  a buffer boundary. The entry points that take a `DecoderTrap` pass the
+  erroneous bytes to the `DecoderTrapFunc` correctly, however.)
+
+* While `RawEncoder.raw_feed()` signals unmappable characters the same way as
+  rust-encoding, which cannot represent the current spec requiring certain
+  unmappables in ISO-2022-JP to be reported as U+FFFD, unmappable characters
+  passed to `EncoderTrap` are reported as U+FFFD where required by the spec for
+  ISO-2022-JP.
+
+* The performance profile of custom `ByteWriter` and `StringWriter` differs from
+  the performance profile of the default `Vec<u8>` and `String`. The former
+  involve an extra intermediate copy of the output while the latter run at the
+  native speed of encoding_rs.
+
