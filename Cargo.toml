@@ -16,7 +16,7 @@ license = "MIT"
 name = "encoding"
 
 [dependencies]
-encoding_rs = "0.2.1"
+encoding_rs = "0.2.2"
 
 [dev-dependencies]
 getopts = "*" # for examples

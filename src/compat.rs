@@ -477,18 +477,7 @@ impl RawEncoderImpl {
         if needed > available {
             dst.reserve(needed);
         }
-        // encoding_rs doesn't provide
-        // encode_from_utf8_to_vec_without_replacement() due to lack of use
-        // cases, so let's inline the implementation here.
-        let (result, read) = unsafe {
-            let old_len = dst.len();
-            let capacity = dst.capacity();
-            dst.set_len(capacity);
-            let (result, read, written) =
-                encoder.encode_from_utf8_without_replacement(src, &mut dst[old_len..], last);
-            dst.set_len(old_len + written);
-            (result, read)
-        };
+        let (result, read) = encoder.encode_from_utf8_to_vec_without_replacement(src, dst, last);
         match result {
             EncoderResult::InputEmpty => {
                 return (RawEncoderResult::Done, read);
