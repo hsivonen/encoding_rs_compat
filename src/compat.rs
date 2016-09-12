@@ -32,7 +32,7 @@ fn encode_char(c: char, buffer: &mut [u8; 4]) -> &str {
     let len = if u <= 0x7F {
         buffer[0] = u as u8;
         1usize
-    } else if u <= 0x0800 {
+    } else if u <= 0x07FF {
         buffer[0] = ((u >> 6) | 0xC0u32) as u8;
         buffer[1] = ((u & 0x3Fu32) | 0x80u32) as u8;
         2usize
