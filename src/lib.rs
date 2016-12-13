@@ -247,8 +247,9 @@ mod tests {
     #[test]
     fn test_decode() {
         fn test_one(input: &[u8], expected_result: &str, expected_encoding: &str) {
-            let (result, used_encoding) =
-                decode(input, DecoderTrap::Strict, all::WINDOWS_1252 as EncodingRef);
+            let (result, used_encoding) = decode(input,
+                                                 DecoderTrap::Strict,
+                                                 all::WINDOWS_1252 as EncodingRef);
             let result = result.unwrap();
             assert_eq!(used_encoding.name(), expected_encoding);
             assert_eq!(&result[..], expected_result);

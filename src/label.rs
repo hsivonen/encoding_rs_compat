@@ -21,7 +21,7 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
     match cp {
         65001 => Some(all::UTF_8 as EncodingRef),
         866 => Some(all::IBM866 as EncodingRef),
-        //        28591 => Some(all::ISO_8859_1 as EncodingRef),
+        // 28591 => Some(all::ISO_8859_1 as EncodingRef),
         28592 => Some(all::ISO_8859_2 as EncodingRef),
         28593 => Some(all::ISO_8859_3 as EncodingRef),
         28594 => Some(all::ISO_8859_4 as EncodingRef),

@@ -110,7 +110,10 @@ impl EncodingWrap {
         }
         let mut total_read = 0usize;
         loop {
-            let (result, read) = raw_encoder.encode_to_writer_without_replacement(&input[total_read..], output, true);
+            let (result, read) =
+                raw_encoder.encode_to_writer_without_replacement(&input[total_read..],
+                                                                 output,
+                                                                 true);
             total_read += read;
             match result {
                 RawEncoderResult::Done => {
@@ -141,7 +144,10 @@ impl EncodingWrap {
         }
         let mut total_read = 0usize;
         loop {
-            let (result, read) = raw_decoder.decode_to_string_without_replacement(&input[total_read..], output, true);
+            let (result, read) =
+                raw_decoder.decode_to_string_without_replacement(&input[total_read..],
+                                                                 output,
+                                                                 true);
             total_read += read;
             match result {
                 RawDecoderResult::Done => {
@@ -172,7 +178,10 @@ impl EncodingWrap {
         }
         let mut total_read = 0usize;
         loop {
-            let (result, read) = raw_decoder.decode_to_writer_without_replacement(&input[total_read..], output, true);
+            let (result, read) =
+                raw_decoder.decode_to_writer_without_replacement(&input[total_read..],
+                                                                 output,
+                                                                 true);
             total_read += read;
             match result {
                 RawDecoderResult::Done => {
@@ -213,7 +222,7 @@ impl types::Encoding for EncodingWrap {
         match trap {
             EncoderTrap::NcrEscape => {
                 let (out, _, _) = self.encoding.encode(input);
-                return Ok(out);
+                return Ok(out.into_owned());
             }
             _ => {
                 let mut out = Vec::new();
@@ -238,7 +247,7 @@ impl types::Encoding for EncodingWrap {
         match trap {
             DecoderTrap::Replace => {
                 let (out, _) = self.encoding.decode_without_bom_handling(input);
-                return Ok(out);
+                return Ok(out.into_owned());
             }
             _ => {
                 let mut out = String::new();
@@ -585,12 +594,7 @@ pub fn to_encoding_rs(encoding: EncodingRef) -> Option<&'static encoding_rs::Enc
             Some(wrap) => {
                 let enc: &'static EncodingWrap = wrap;
                 let enc_ref: EncodingRef = enc;
-                //                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
-                //                    return Some(wrap.encoding);
-                //                }
-                // Compare by name rather than by pointer pending an answer to
-                // https://users.rust-lang.org/t/how-to-expose-a-static-reference-and-an-unmangled-static-pointer-to-the-same-memory-location/6529
-                if enc_ref.whatwg_name() == encoding.whatwg_name() {
+                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
                     return Some(wrap.encoding);
                 }
             }
@@ -607,326 +611,326 @@ pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
 }
 
 /// All `EncodingWrap` objects in guestimated order of frequency of usage.
-static WRAPS: [&'static EncodingWrap; 40] = [UTF_8,
-                                             WINDOWS_1252,
-                                             GBK,
-                                             SHIFT_JIS,
-                                             BIG5,
-                                             EUC_KR,
-                                             EUC_JP,
-                                             GB18030,
-                                             WINDOWS_1250,
-                                             WINDOWS_1251,
-                                             WINDOWS_1253,
-                                             WINDOWS_1254,
-                                             WINDOWS_1255,
-                                             WINDOWS_1256,
-                                             WINDOWS_1257,
-                                             WINDOWS_1258,
-                                             WINDOWS_874,
-                                             ISO_8859_2,
-                                             ISO_8859_15,
-                                             IBM866,
-                                             KOI8_R,
-                                             KOI8_U,
-                                             ISO_8859_3,
-                                             ISO_8859_4,
-                                             ISO_8859_5,
-                                             ISO_8859_6,
-                                             ISO_8859_7,
-                                             ISO_8859_8,
-                                             X_MAC_CYRILLIC,
-                                             REPLACEMENT,
-                                             ISO_2022_JP,
-                                             ISO_8859_8_I,
-                                             X_USER_DEFINED,
-                                             UTF_16BE,
-                                             UTF_16LE,
-                                             MACINTOSH,
-                                             ISO_8859_10,
-                                             ISO_8859_13,
-                                             ISO_8859_14,
-                                             ISO_8859_16];
+static WRAPS: [&'static EncodingWrap; 40] = [&UTF_8,
+                                             &WINDOWS_1252,
+                                             &GBK,
+                                             &SHIFT_JIS,
+                                             &BIG5,
+                                             &EUC_KR,
+                                             &EUC_JP,
+                                             &GB18030,
+                                             &WINDOWS_1250,
+                                             &WINDOWS_1251,
+                                             &WINDOWS_1253,
+                                             &WINDOWS_1254,
+                                             &WINDOWS_1255,
+                                             &WINDOWS_1256,
+                                             &WINDOWS_1257,
+                                             &WINDOWS_1258,
+                                             &WINDOWS_874,
+                                             &ISO_8859_2,
+                                             &ISO_8859_15,
+                                             &IBM866,
+                                             &KOI8_R,
+                                             &KOI8_U,
+                                             &ISO_8859_3,
+                                             &ISO_8859_4,
+                                             &ISO_8859_5,
+                                             &ISO_8859_6,
+                                             &ISO_8859_7,
+                                             &ISO_8859_8,
+                                             &X_MAC_CYRILLIC,
+                                             &REPLACEMENT,
+                                             &ISO_2022_JP,
+                                             &ISO_8859_8_I,
+                                             &X_USER_DEFINED,
+                                             &UTF_16BE,
+                                             &UTF_16LE,
+                                             &MACINTOSH,
+                                             &ISO_8859_10,
+                                             &ISO_8859_13,
+                                             &ISO_8859_14,
+                                             &ISO_8859_16];
 
 // BEGIN GENERATED CODE. PLEASE DO NOT EDIT.
 // Instead, please regenerate using generate_constants.py
 
 /// The Big5 encoding.
-pub const BIG5: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::BIG5,
+pub static BIG5: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::BIG5_INIT,
     whatwg_name: "big5",
     name: "big5-2003",
 };
 
 /// The EUC-JP encoding.
-pub const EUC_JP: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::EUC_JP,
+pub static EUC_JP: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::EUC_JP_INIT,
     whatwg_name: "euc-jp",
     name: "euc-jp",
 };
 
 /// The EUC-KR encoding.
-pub const EUC_KR: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::EUC_KR,
+pub static EUC_KR: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::EUC_KR_INIT,
     whatwg_name: "euc-kr",
     name: "windows-949",
 };
 
 /// The GBK encoding.
-pub const GBK: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::GBK,
+pub static GBK: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::GBK_INIT,
     whatwg_name: "gbk",
     name: "gbk",
 };
 
 /// The IBM866 encoding.
-pub const IBM866: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::IBM866,
+pub static IBM866: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::IBM866_INIT,
     whatwg_name: "ibm866",
     name: "ibm866",
 };
 
 /// The ISO-2022-JP encoding.
-pub const ISO_2022_JP: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_2022_JP,
+pub static ISO_2022_JP: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_2022_JP_INIT,
     whatwg_name: "iso-2022-jp",
     name: "iso-2022-jp",
 };
 
 /// The ISO-8859-10 encoding.
-pub const ISO_8859_10: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_10,
+pub static ISO_8859_10: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_10_INIT,
     whatwg_name: "iso-8859-10",
     name: "iso-8859-10",
 };
 
 /// The ISO-8859-13 encoding.
-pub const ISO_8859_13: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_13,
+pub static ISO_8859_13: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_13_INIT,
     whatwg_name: "iso-8859-13",
     name: "iso-8859-13",
 };
 
 /// The ISO-8859-14 encoding.
-pub const ISO_8859_14: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_14,
+pub static ISO_8859_14: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_14_INIT,
     whatwg_name: "iso-8859-14",
     name: "iso-8859-14",
 };
 
 /// The ISO-8859-15 encoding.
-pub const ISO_8859_15: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_15,
+pub static ISO_8859_15: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_15_INIT,
     whatwg_name: "iso-8859-15",
     name: "iso-8859-15",
 };
 
 /// The ISO-8859-16 encoding.
-pub const ISO_8859_16: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_16,
+pub static ISO_8859_16: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_16_INIT,
     whatwg_name: "iso-8859-16",
     name: "iso-8859-16",
 };
 
 /// The ISO-8859-2 encoding.
-pub const ISO_8859_2: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_2,
+pub static ISO_8859_2: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_2_INIT,
     whatwg_name: "iso-8859-2",
     name: "iso-8859-2",
 };
 
 /// The ISO-8859-3 encoding.
-pub const ISO_8859_3: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_3,
+pub static ISO_8859_3: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_3_INIT,
     whatwg_name: "iso-8859-3",
     name: "iso-8859-3",
 };
 
 /// The ISO-8859-4 encoding.
-pub const ISO_8859_4: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_4,
+pub static ISO_8859_4: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_4_INIT,
     whatwg_name: "iso-8859-4",
     name: "iso-8859-4",
 };
 
 /// The ISO-8859-5 encoding.
-pub const ISO_8859_5: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_5,
+pub static ISO_8859_5: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_5_INIT,
     whatwg_name: "iso-8859-5",
     name: "iso-8859-5",
 };
 
 /// The ISO-8859-6 encoding.
-pub const ISO_8859_6: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_6,
+pub static ISO_8859_6: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_6_INIT,
     whatwg_name: "iso-8859-6",
     name: "iso-8859-6",
 };
 
 /// The ISO-8859-7 encoding.
-pub const ISO_8859_7: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_7,
+pub static ISO_8859_7: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_7_INIT,
     whatwg_name: "iso-8859-7",
     name: "iso-8859-7",
 };
 
 /// The ISO-8859-8 encoding.
-pub const ISO_8859_8: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_8,
+pub static ISO_8859_8: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_8_INIT,
     whatwg_name: "iso-8859-8",
     name: "iso-8859-8",
 };
 
 /// The ISO-8859-8-I encoding.
-pub const ISO_8859_8_I: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::ISO_8859_8_I,
+pub static ISO_8859_8_I: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::ISO_8859_8_I_INIT,
     whatwg_name: "iso-8859-8-i",
     name: "iso-8859-8-i",
 };
 
 /// The KOI8-R encoding.
-pub const KOI8_R: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::KOI8_R,
+pub static KOI8_R: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::KOI8_R_INIT,
     whatwg_name: "koi8-r",
     name: "koi8-r",
 };
 
 /// The KOI8-U encoding.
-pub const KOI8_U: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::KOI8_U,
+pub static KOI8_U: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::KOI8_U_INIT,
     whatwg_name: "koi8-u",
     name: "koi8-u",
 };
 
 /// The Shift_JIS encoding.
-pub const SHIFT_JIS: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::SHIFT_JIS,
+pub static SHIFT_JIS: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::SHIFT_JIS_INIT,
     whatwg_name: "shift_jis",
     name: "windows-31j",
 };
 
 /// The UTF-16BE encoding.
-pub const UTF_16BE: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::UTF_16BE,
+pub static UTF_16BE: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::UTF_16BE_INIT,
     whatwg_name: "utf-16be",
     name: "utf-16be",
 };
 
 /// The UTF-16LE encoding.
-pub const UTF_16LE: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::UTF_16LE,
+pub static UTF_16LE: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::UTF_16LE_INIT,
     whatwg_name: "utf-16le",
     name: "utf-16le",
 };
 
 /// The UTF-8 encoding.
-pub const UTF_8: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::UTF_8,
+pub static UTF_8: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::UTF_8_INIT,
     whatwg_name: "utf-8",
     name: "utf-8",
 };
 
 /// The gb18030 encoding.
-pub const GB18030: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::GB18030,
+pub static GB18030: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::GB18030_INIT,
     whatwg_name: "gb18030",
     name: "gb18030",
 };
 
 /// The macintosh encoding.
-pub const MACINTOSH: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::MACINTOSH,
+pub static MACINTOSH: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::MACINTOSH_INIT,
     whatwg_name: "macintosh",
     name: "mac-roman",
 };
 
 /// The replacement encoding.
-pub const REPLACEMENT: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::REPLACEMENT,
+pub static REPLACEMENT: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::REPLACEMENT_INIT,
     whatwg_name: "replacement",
     name: "encoder-only-utf-8",
 };
 
 /// The windows-1250 encoding.
-pub const WINDOWS_1250: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1250,
+pub static WINDOWS_1250: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1250_INIT,
     whatwg_name: "windows-1250",
     name: "windows-1250",
 };
 
 /// The windows-1251 encoding.
-pub const WINDOWS_1251: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1251,
+pub static WINDOWS_1251: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1251_INIT,
     whatwg_name: "windows-1251",
     name: "windows-1251",
 };
 
 /// The windows-1252 encoding.
-pub const WINDOWS_1252: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1252,
+pub static WINDOWS_1252: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1252_INIT,
     whatwg_name: "windows-1252",
     name: "windows-1252",
 };
 
 /// The windows-1253 encoding.
-pub const WINDOWS_1253: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1253,
+pub static WINDOWS_1253: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1253_INIT,
     whatwg_name: "windows-1253",
     name: "windows-1253",
 };
 
 /// The windows-1254 encoding.
-pub const WINDOWS_1254: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1254,
+pub static WINDOWS_1254: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1254_INIT,
     whatwg_name: "windows-1254",
     name: "windows-1254",
 };
 
 /// The windows-1255 encoding.
-pub const WINDOWS_1255: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1255,
+pub static WINDOWS_1255: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1255_INIT,
     whatwg_name: "windows-1255",
     name: "windows-1255",
 };
 
 /// The windows-1256 encoding.
-pub const WINDOWS_1256: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1256,
+pub static WINDOWS_1256: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1256_INIT,
     whatwg_name: "windows-1256",
     name: "windows-1256",
 };
 
 /// The windows-1257 encoding.
-pub const WINDOWS_1257: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1257,
+pub static WINDOWS_1257: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1257_INIT,
     whatwg_name: "windows-1257",
     name: "windows-1257",
 };
 
 /// The windows-1258 encoding.
-pub const WINDOWS_1258: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_1258,
+pub static WINDOWS_1258: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_1258_INIT,
     whatwg_name: "windows-1258",
     name: "windows-1258",
 };
 
 /// The windows-874 encoding.
-pub const WINDOWS_874: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::WINDOWS_874,
+pub static WINDOWS_874: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::WINDOWS_874_INIT,
     whatwg_name: "windows-874",
     name: "windows-874",
 };
 
 /// The x-mac-cyrillic encoding.
-pub const X_MAC_CYRILLIC: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::X_MAC_CYRILLIC,
+pub static X_MAC_CYRILLIC: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::X_MAC_CYRILLIC_INIT,
     whatwg_name: "x-mac-cyrillic",
     name: "mac-cyrillic",
 };
 
 /// The x-user-defined encoding.
-pub const X_USER_DEFINED: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::X_USER_DEFINED,
+pub static X_USER_DEFINED: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::X_USER_DEFINED_INIT,
     whatwg_name: "x-user-defined",
     name: "pua-mapped-binary",
 };

@@ -10,9 +10,9 @@ mod bigfive2003_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const BigFive2003Encoding: EncodingRef = all::BIG5_2003;
+    static BigFive2003Encoding: EncodingRef = &compat::BIG5;
 
     #[test]
     fn test_encoder_valid() {
@@ -137,9 +137,10 @@ mod bigfive2003_tests {
     #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
-        let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+        let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT,
+                                           EncoderTrap::Strict)
+                                   .ok()
+                                   .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({

@@ -10,9 +10,9 @@ mod gb18030_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const GB18030_ENCODING: EncodingRef = all::GB18030;
+    static GB18030_ENCODING: EncodingRef = &compat::GB18030;
 
     #[test]
     fn test_encoder() {
@@ -187,8 +187,8 @@ mod gb18030_tests {
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = GB18030_ENCODING.encode(testutils::SIMPLIFIED_CHINESE_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+                                .ok()
+                                .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({
@@ -204,9 +204,9 @@ mod gbk_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const GBK_ENCODING: EncodingRef = all::GBK;
+    static GBK_ENCODING: EncodingRef = &compat::GBK;
 
     // GBK and GB 18030 share the same decoder logic.
 

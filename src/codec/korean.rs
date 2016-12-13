@@ -10,9 +10,9 @@ mod windows949_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const Windows949Encoding: EncodingRef = all::WINDOWS_949;
+    static Windows949Encoding: EncodingRef = &compat::EUC_KR;
 
     #[test]
     fn test_encoder_valid() {
@@ -152,8 +152,8 @@ mod windows949_tests {
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows949Encoding.encode(testutils::KOREAN_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+                                  .ok()
+                                  .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({

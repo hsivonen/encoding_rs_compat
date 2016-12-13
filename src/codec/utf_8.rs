@@ -54,9 +54,9 @@ mod tests {
     use std::str;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const UTF8Encoding: EncodingRef = all::UTF_8;
+    static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
     #[test]
     fn test_valid() {
@@ -462,9 +462,9 @@ mod tests {
         use std::str;
         use testutils;
         use types::*;
-        use all;
+        use compat;
 
-        const UTF8Encoding: EncodingRef = all::UTF_8;
+        static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
         #[cfg(nightly)]
         #[bench]
@@ -536,9 +536,9 @@ mod tests {
         use std::str;
         use testutils;
         use types::*;
-        use all;
+        use compat;
 
-        const UTF8Encoding: EncodingRef = all::UTF_8;
+        static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
         #[cfg(nightly)]
         #[bench]
@@ -609,9 +609,9 @@ mod tests {
         use testutils;
         use types::*;
         use types::DecoderTrap::Replace as DecodeReplace;
-        use all;
+        use compat;
 
-        const UTF8Encoding: EncodingRef = all::UTF_8;
+        static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
         #[cfg(nightly)]
         #[bench]
@@ -670,9 +670,9 @@ mod tests {
         use testutils;
         use types::*;
         use types::DecoderTrap::Replace as DecodeReplace;
-        use all;
+        use compat;
 
-        const UTF8Encoding: EncodingRef = all::UTF_8;
+        static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
         #[cfg(nightly)]
         #[bench]

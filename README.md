@@ -20,6 +20,10 @@ functionality.
 
 * The types of the constants in `all::*` differ.
 
+* The "constants" in `all::*` are `static` instead of `const`, because they
+  need to refer to `static`s and Rust, very annoyingly, doesn't allow `const`
+  to refer to even an address of a `static`.
+
 * There is no direct access to the indices.
 
 * The `codec` module isn't visible.

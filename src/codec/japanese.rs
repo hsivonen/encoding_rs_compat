@@ -10,9 +10,9 @@ mod eucjp_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const EUCJPEncoding: EncodingRef = all::EUC_JP;
+    static EUCJPEncoding: EncodingRef = &compat::EUC_JP;
 
     #[test]
     fn test_encoder_valid() {
@@ -262,8 +262,8 @@ mod eucjp_tests {
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = EUCJPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+                             .ok()
+                             .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({
@@ -279,9 +279,9 @@ mod windows31j_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const Windows31JEncoding: EncodingRef = all::WINDOWS_31J;
+    static Windows31JEncoding: EncodingRef = &compat::SHIFT_JIS;
 
     #[test]
     fn test_encoder_valid() {
@@ -462,8 +462,8 @@ mod windows31j_tests {
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows31JEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+                                  .ok()
+                                  .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({
@@ -479,9 +479,9 @@ mod iso2022jp_tests {
     extern crate test;
     use testutils;
     use types::*;
-    use all;
+    use compat;
 
-    const ISO2022JPEncoding: EncodingRef = all::ISO_2022_JP;
+    static ISO2022JPEncoding: EncodingRef = &compat::ISO_2022_JP;
 
     #[test]
     fn test_encoder_valid() {
@@ -592,9 +592,25 @@ mod iso2022jp_tests {
         const DE: &'static [u8] = &[0x1b, 0x24, 0x28, 0x44, 0x50, 0x4b];
         let mut d = ISO2022JPEncoding.raw_decoder();
         let dec: String = ["\x20", AD, BD, BD, CD, CD, AD, CD, BD, AD, DD, DD, BD, DD, CD, DD, AD]
-            .concat();
-        let enc: Vec<_> =
-            [&[0x20][..], AE, BE, BE, CE, CE, AE, CE, BE, AE, DE, DE, BE, DE, CE, DE, AE].concat();
+                              .concat();
+        let enc: Vec<_> = [&[0x20][..],
+                           AE,
+                           BE,
+                           BE,
+                           CE,
+                           CE,
+                           AE,
+                           CE,
+                           BE,
+                           AE,
+                           DE,
+                           DE,
+                           BE,
+                           DE,
+                           CE,
+                           DE,
+                           AE]
+                              .concat();
         assert_feed_ok!(d, enc, [], dec);
         assert_finish_ok!(d, "");
     }
@@ -826,8 +842,8 @@ mod iso2022jp_tests {
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = ISO2022JPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
-            .ok()
-            .unwrap();
+                                 .ok()
+                                 .unwrap();
         bencher.bytes = s.len() as u64;
         bencher.iter(|| {
             test::black_box({

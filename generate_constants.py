@@ -76,7 +76,7 @@ def to_rust_encoding_constant_name(name):
     return to_constant_name(to_rust_encoding_name(name))
   return to_constant_name(name)
 
-# 
+#
 
 for group in data:
   for encoding in group["encodings"]:
@@ -116,8 +116,8 @@ compat_file.write("""
 
 for name in preferred:
   compat_file.write('''/// The %s encoding.
-pub const %s: &'static EncodingWrap = &EncodingWrap {
-    encoding: encoding_rs::%s,
+pub static %s: EncodingWrap = EncodingWrap {
+    encoding: &encoding_rs::%s_INIT,
     whatwg_name: "%s",
     name: "%s",
 };
@@ -141,7 +141,7 @@ for name in preferred:
   if name in ON_WHATWG_LIST_IN_RUST_ENCODING:
     continue
   all_file.write('''/// The %s encoding.
-pub const %s: &'static compat::EncodingWrap = compat::%s;
+pub static %s: &'static compat::EncodingWrap = &compat::%s;
 
 ''' % (name, to_rust_encoding_constant_name(name), to_constant_name(name)))
 
