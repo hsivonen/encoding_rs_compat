@@ -18,6 +18,8 @@ functionality.
 * HZ, ISO-8859-1 as an encoding distinct from windows-1252 and the error
   encoding are not supported.
 
+* Attempting to encode to UTF-16LE or UTF-16BE panics.
+
 * The types of the constants in `all::*` differ.
 
 * The "constants" in `all::*` are `static` instead of `const`, because they

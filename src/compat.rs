@@ -199,6 +199,12 @@ impl EncodingWrap {
             }
         }
     }
+
+    fn panic_if_utf16(&self) {
+        if self.encoding == encoding_rs::UTF_16LE || self.encoding == encoding_rs::UTF_16BE {
+            panic!("Can't encode to UTF-16.");
+        }
+    }
 }
 
 impl types::Encoding for EncodingWrap {
@@ -211,6 +217,7 @@ impl types::Encoding for EncodingWrap {
     }
 
     fn raw_encoder(&self) -> Box<RawEncoder> {
+        self.panic_if_utf16();
         Box::new(RawEncoderImpl::new(self.encoding))
     }
 
@@ -219,6 +226,7 @@ impl types::Encoding for EncodingWrap {
     }
 
     fn encode(&self, input: &str, trap: EncoderTrap) -> Result<Vec<u8>, Cow<'static, str>> {
+        self.panic_if_utf16();
         if self.encoding.output_encoding() == encoding_rs::UTF_8 {
             let mut vec = Vec::with_capacity(input.len());
             vec.extend_from_slice(input.as_bytes());
@@ -241,6 +249,7 @@ impl types::Encoding for EncodingWrap {
                  trap: EncoderTrap,
                  output: &mut ByteWriter)
                  -> Result<(), Cow<'static, str>> {
+        self.panic_if_utf16();
         if self.encoding.output_encoding() == encoding_rs::UTF_8 {
             output.write_bytes(input.as_bytes());
             return Ok(());
