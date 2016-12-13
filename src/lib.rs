@@ -211,8 +211,7 @@
 //!
 //!
 
-// #[cfg(test)]
-// extern crate test;
+#![cfg_attr(test, feature(test))] // lib stability features as per RFC #507
 
 pub use self::types::{CodecError, ByteWriter, StringWriter, RawEncoder, RawDecoder, EncodingRef,
                       Encoding, EncoderTrapFunc, DecoderTrapFunc, DecoderTrap, EncoderTrap, decode}; // reexport
