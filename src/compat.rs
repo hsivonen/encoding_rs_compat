@@ -219,6 +219,11 @@ impl types::Encoding for EncodingWrap {
     }
 
     fn encode(&self, input: &str, trap: EncoderTrap) -> Result<Vec<u8>, Cow<'static, str>> {
+        if self.encoding.output_encoding() == encoding_rs::UTF_8 {
+            let mut vec = Vec::with_capacity(input.len());
+            vec.extend_from_slice(input.as_bytes());
+            return Ok(vec);
+        }
         match trap {
             EncoderTrap::NcrEscape => {
                 let (out, _, _) = self.encoding.encode(input);
@@ -236,6 +241,10 @@ impl types::Encoding for EncodingWrap {
                  trap: EncoderTrap,
                  output: &mut ByteWriter)
                  -> Result<(), Cow<'static, str>> {
+        if self.encoding.output_encoding() == encoding_rs::UTF_8 {
+            output.write_bytes(input.as_bytes());
+            return Ok(());
+        }
         match output.as_mut_vec() {
             None => {}
             Some(vec) => return self.encode_to_vec(input, trap, vec),
