@@ -456,7 +456,6 @@ mod tests {
     }
 
     mod bench_ascii {
-        #[cfg(nightly)]
         extern crate test;
         use super::super::from_utf8;
         use std::str;
@@ -466,7 +465,6 @@ mod tests {
 
         static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_encode(bencher: &mut test::Bencher) {
             let s = testutils::ASCII_TEXT;
@@ -478,7 +476,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_decode(bencher: &mut test::Bencher) {
             let s = testutils::ASCII_TEXT.as_bytes();
@@ -490,7 +487,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_from_utf8(bencher: &mut test::Bencher) {
             let s = testutils::ASCII_TEXT.as_bytes();
@@ -502,7 +498,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8(bencher: &mut test::Bencher) {
             let s = testutils::ASCII_TEXT.as_bytes();
@@ -514,7 +509,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_lossy(bencher: &mut test::Bencher) {
             let s = testutils::ASCII_TEXT.as_bytes();
@@ -530,7 +524,6 @@ mod tests {
     // why Korean? it has an excellent mix of multibyte sequences and ASCII sequences
     // unlike other CJK scripts, so it reflects a practical use case a bit better.
     mod bench_korean {
-        #[cfg(nightly)]
         extern crate test;
         use super::super::from_utf8;
         use std::str;
@@ -540,7 +533,6 @@ mod tests {
 
         static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_encode(bencher: &mut test::Bencher) {
             let s = testutils::KOREAN_TEXT;
@@ -552,7 +544,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_decode(bencher: &mut test::Bencher) {
             let s = testutils::KOREAN_TEXT.as_bytes();
@@ -564,7 +555,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_from_utf8(bencher: &mut test::Bencher) {
             let s = testutils::KOREAN_TEXT.as_bytes();
@@ -576,7 +566,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8(bencher: &mut test::Bencher) {
             let s = testutils::KOREAN_TEXT.as_bytes();
@@ -588,7 +577,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_lossy(bencher: &mut test::Bencher) {
             let s = testutils::KOREAN_TEXT.as_bytes();
@@ -602,7 +590,6 @@ mod tests {
     }
 
     mod bench_lossy_invalid {
-        #[cfg(nightly)]
         extern crate test;
         use super::super::from_utf8;
         use std::str;
@@ -613,7 +600,6 @@ mod tests {
 
         static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_decode_replace(bencher: &mut test::Bencher) {
             let s = testutils::INVALID_UTF8_TEXT;
@@ -625,7 +611,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_from_utf8_failing(bencher: &mut test::Bencher) {
             let s = testutils::INVALID_UTF8_TEXT;
@@ -637,7 +622,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_failing(bencher: &mut test::Bencher) {
             let s = testutils::INVALID_UTF8_TEXT;
@@ -649,7 +633,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_lossy(bencher: &mut test::Bencher) {
             let s = testutils::INVALID_UTF8_TEXT;
@@ -663,7 +646,6 @@ mod tests {
     }
 
     mod bench_lossy_external {
-        #[cfg(nightly)]
         extern crate test;
         use super::super::from_utf8;
         use std::str;
@@ -674,7 +656,6 @@ mod tests {
 
         static UTF8Encoding: EncodingRef = &compat::UTF_8;
 
-        #[cfg(nightly)]
         #[bench]
         fn bench_decode_replace(bencher: &mut test::Bencher) {
             let s = testutils::get_external_bench_data();
@@ -686,7 +667,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_from_utf8_failing(bencher: &mut test::Bencher) {
             let s = testutils::get_external_bench_data();
@@ -698,7 +678,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_failing(bencher: &mut test::Bencher) {
             let s = testutils::get_external_bench_data();
@@ -710,7 +689,6 @@ mod tests {
             })
         }
 
-        #[cfg(nightly)]
         #[bench] // for the comparison
         fn bench_stdlib_from_utf8_lossy(bencher: &mut test::Bencher) {
             let s = testutils::get_external_bench_data();

@@ -6,7 +6,6 @@
 
 #[cfg(test)]
 mod eucjp_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -246,7 +245,6 @@ mod eucjp_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -258,7 +256,6 @@ mod eucjp_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = EUCJPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
@@ -275,7 +272,6 @@ mod eucjp_tests {
 
 #[cfg(test)]
 mod windows31j_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -446,7 +442,6 @@ mod windows31j_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -458,7 +453,6 @@ mod windows31j_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows31JEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)
@@ -475,7 +469,6 @@ mod windows31j_tests {
 
 #[cfg(test)]
 mod iso2022jp_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -826,7 +819,6 @@ mod iso2022jp_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::JAPANESE_TEXT;
@@ -838,7 +830,6 @@ mod iso2022jp_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = ISO2022JPEncoding.encode(testutils::JAPANESE_TEXT, EncoderTrap::Strict)

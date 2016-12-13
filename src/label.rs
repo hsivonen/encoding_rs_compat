@@ -60,7 +60,6 @@ pub fn encoding_from_windows_code_page(cp: usize) -> Option<EncodingRef> {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(nightly)]
     extern crate test;
     use all;
     use super::encoding_from_whatwg_label;
@@ -88,7 +87,6 @@ mod tests {
         }
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encoding_from_whatwg_label(bencher: &mut test::Bencher) {
         bencher.iter(|| {

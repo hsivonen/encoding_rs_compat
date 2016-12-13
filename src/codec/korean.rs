@@ -6,7 +6,6 @@
 
 #[cfg(test)]
 mod windows949_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -136,7 +135,6 @@ mod windows949_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::KOREAN_TEXT;
@@ -148,7 +146,6 @@ mod windows949_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = Windows949Encoding.encode(testutils::KOREAN_TEXT, EncoderTrap::Strict)

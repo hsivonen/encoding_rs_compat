@@ -6,7 +6,6 @@
 
 #[cfg(test)]
 mod gb18030_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -171,7 +170,6 @@ mod gb18030_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;
@@ -183,7 +181,6 @@ mod gb18030_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = GB18030_ENCODING.encode(testutils::SIMPLIFIED_CHINESE_TEXT, EncoderTrap::Strict)
@@ -200,7 +197,6 @@ mod gb18030_tests {
 
 #[cfg(test)]
 mod gbk_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -237,7 +233,6 @@ mod gbk_tests {
         assert_finish_ok!(e, []);
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::SIMPLIFIED_CHINESE_TEXT;

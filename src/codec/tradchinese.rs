@@ -6,7 +6,6 @@
 
 #[cfg(test)]
 mod bigfive2003_tests {
-    #[cfg(nightly)]
     extern crate test;
     use testutils;
     use types::*;
@@ -122,7 +121,6 @@ mod bigfive2003_tests {
         assert_finish_ok!(d, "");
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_encode_short_text(bencher: &mut test::Bencher) {
         let s = testutils::TRADITIONAL_CHINESE_TEXT;
@@ -134,7 +132,6 @@ mod bigfive2003_tests {
         })
     }
 
-    #[cfg(nightly)]
     #[bench]
     fn bench_decode_short_text(bencher: &mut test::Bencher) {
         let s = BigFive2003Encoding.encode(testutils::TRADITIONAL_CHINESE_TEXT,
