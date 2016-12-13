@@ -5,8 +5,7 @@ authors = ["Kang Seonghoon (upstream author) <public+rust@mearie.org>",
            "Henri Sivonen (fork author) <hsivonen@hsivonen.fi>"]
 
 description = "rust-encoding API compatibility for encoding_rs"
-homepage = "https://hsivonen.fi/rs/encoding_rs/"
-documentation = "https://hsivonen.fi/rs/encoding_rs/"
+homepage = "https://github.com/hsivonen/encoding_rs_compat"
 repository = "https://github.com/hsivonen/encoding_rs_compat"
 keywords = ["encoding", "unicode", "charset", "encoding_rs", "rust-encoding"]
 readme = "README.md"
