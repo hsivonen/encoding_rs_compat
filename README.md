@@ -10,6 +10,18 @@ internals replaced. The use case is to allow Gecko to use crates that depend
 on rust-encoding without having to include duplicate data tables and converter
 functionality.
 
+## Usage
+
+Put this in the `Cargo.toml` file of your top-level Cargo artifact:
+
+```
+[replace]
+"encoding:0.2.33" = { git = 'https://github.com/hsivonen/encoding_rs_compat' }
+```
+
+Upon `cargo build`, ensure you see don't see the `encoding-index-*` crates being built.
+
+
 ## Differences from rust-encoding
 
 * The bugs in the converters and the spec snapshot they implement are those
