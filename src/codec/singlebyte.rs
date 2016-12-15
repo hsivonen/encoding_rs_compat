@@ -4,10 +4,6 @@
 
 //! Common codec implementation for single-byte encodings.
 
-use std::convert::Into;
-use util::{as_char, StrCharIndex};
-use types::*;
-
 #[cfg(test)]
 mod tests {
     use all::ISO_8859_2;

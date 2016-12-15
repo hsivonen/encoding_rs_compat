@@ -4,6 +4,9 @@
 
 //! 7-bit ASCII encoding.
 
+#[warn(unused_variables)]
+#[warn(unused_mut)]
+
 use std::mem;
 use std::convert::Into;
 use types::*;

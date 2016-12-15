@@ -4,17 +4,7 @@
 
 //! Internal utilities.
 
-use std::{str, char, mem};
-use std::marker::PhantomData;
-use std::convert::Into;
-use std::default::Default;
-use types;
-
-/// Unchecked conversion to `char`.
-pub fn as_char(ch: u32) -> char {
-    debug_assert!(char::from_u32(ch).is_some());
-    unsafe { mem::transmute(ch) }
-}
+use std::{str, char};
 
 /// External iterator for a string's characters with its corresponding byte offset range.
 pub struct StrCharIndexIterator<'r> {
