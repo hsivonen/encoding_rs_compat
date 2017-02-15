@@ -27,31 +27,6 @@ const DECODER_BUFFER_LENGTH: usize = 1024;
 
 const ENCODER_BUFFER_LENGTH: usize = 1024;
 
-fn encode_char(c: char, buffer: &mut [u8; 4]) -> &str {
-    let u = c as u32;
-    let len = if u <= 0x7F {
-        buffer[0] = u as u8;
-        1usize
-    } else if u <= 0x07FF {
-        buffer[0] = ((u >> 6) | 0xC0u32) as u8;
-        buffer[1] = ((u & 0x3Fu32) | 0x80u32) as u8;
-        2usize
-    } else if u <= 0xFFFF {
-        buffer[0] = ((u >> 12) | 0xE0u32) as u8;
-        buffer[1] = (((u & 0xFC0u32) >> 6) | 0x80u32) as u8;
-        buffer[2] = ((u & 0x3Fu32) | 0x80u32) as u8;
-        3usize
-    } else {
-        buffer[0] = ((u >> 18) | 0xF0u32) as u8;
-        buffer[1] = (((u & 0x3F000u32) >> 12) | 0x80u32) as u8;
-        buffer[2] = (((u & 0xFC0u32) >> 6) | 0x80u32) as u8;
-        buffer[3] = ((u & 0x3Fu32) | 0x80u32) as u8;
-        4usize
-    };
-    let slice = &buffer[..len];
-    unsafe { ::std::mem::transmute(slice) }
-}
-
 pub struct EncodingWrap {
     /// The wrapped encoding_rs `Encoding`
     encoding: &'static encoding_rs::Encoding,
@@ -86,7 +61,7 @@ impl EncodingWrap {
                 }
                 RawEncoderResult::Unmappable(c) => {
                     if trap.trap(&mut raw_encoder,
-                                 encode_char(c, &mut unmappable_buffer),
+                                 c.encode_utf8(&mut unmappable_buffer),
                                  output) {
                         continue;
                     } else {
@@ -121,7 +96,7 @@ impl EncodingWrap {
                 }
                 RawEncoderResult::Unmappable(c) => {
                     if trap.trap(&mut raw_encoder,
-                                 encode_char(c, &mut unmappable_buffer),
+                                 c.encode_utf8(&mut unmappable_buffer),
                                  output) {
                         continue;
                     } else {
