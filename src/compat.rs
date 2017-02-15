@@ -561,46 +561,30 @@ impl RawEncoder for RawEncoderImpl {
 }
 
 pub fn from_encoding_rs(encoding: &'static encoding_rs::Encoding) -> EncodingRef {
-    let mut it = WRAPS.iter();
-    loop {
-        match it.next() {
-            None => unreachable!("How can an unlisted &'static encoding_rs::Encoding exist?"),
-            Some(wrap) => {
-                if wrap.encoding == encoding {
-                    // Need this intermediate binding to keep the compiler
-                    // happy.
-                    let enc: &'static EncodingWrap = wrap;
-                    return enc;
-                }
-            }
+    for wrap in &WRAPS[..] {
+        if wrap.encoding == encoding {
+            // Need this intermediate binding to keep the compiler
+            // happy.
+            let enc: &'static EncodingWrap = wrap;
+            return enc;
         }
     }
+    unreachable!("How can an unlisted &'static encoding_rs::Encoding exist?");
 }
 
 pub fn to_encoding_rs(encoding: EncodingRef) -> Option<&'static encoding_rs::Encoding> {
-    let mut it = WRAPS.iter();
-    loop {
-        match it.next() {
-            None => {
-                return None;
-            }
-            Some(wrap) => {
-                let enc: &'static EncodingWrap = wrap;
-                let enc_ref: EncodingRef = enc;
-                if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
-                    return Some(wrap.encoding);
-                }
-            }
+    for wrap in &WRAPS[..] {
+        let enc: &'static EncodingWrap = wrap;
+        let enc_ref: EncodingRef = enc;
+        if (enc_ref as *const types::Encoding) == (encoding as *const types::Encoding) {
+            return Some(wrap.encoding);
         }
     }
+    None
 }
 
 pub fn encoding_rs_for_label(label: &str) -> Option<EncodingRef> {
-    let enc = encoding_rs::Encoding::for_label(label.as_bytes());
-    match enc {
-        None => None,
-        Some(encoding) => Some(from_encoding_rs(encoding)),
-    }
+    encoding_rs::Encoding::for_label(label.as_bytes()).map(from_encoding_rs)
 }
 
 /// All `EncodingWrap` objects in guestimated order of frequency of usage.
