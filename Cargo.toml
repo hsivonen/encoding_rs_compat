@@ -20,7 +20,7 @@ no-optimized-legacy-encoding = ["encoding_rs/no-static-ideograph-encoder-tables"
 parallel-utf8 = ["encoding_rs/parallel-utf8"]
 
 [dependencies]
-encoding_rs = "0.4.0"
+encoding_rs = "0.5.0"
 
 [dev-dependencies]
 getopts = "*" # for examples
