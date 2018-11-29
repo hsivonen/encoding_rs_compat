@@ -6,9 +6,10 @@ encoding_rs_compat provides the
 [rust-encoding](https://lifthrasiir.github.io/rust-encoding/) 0.2.33 API
 implemented on top of [encoding_rs](https://hsivonen.fi/rs/encoding_rs/).
 Technically, encoding_rs_compat is a fork of rust-encoding 0.2.32 with the 
-internals replaced. The use case is to allow Gecko to use crates that depend
+internals replaced. The use case was to allow Gecko to use crates that depend
 on rust-encoding without having to include duplicate data tables and converter
-functionality.
+functionality, but Gecko ended up not needing this compatibility crate after
+all.
 
 ## Usage
 
@@ -27,7 +28,7 @@ Upon `cargo build`, ensure you see don't see the `encoding-index-*` crates being
 * The bugs in the converters and the spec snapshot they implement are those
   of encoding_rs.
 
-* HZ, ISO-8859-1 as an encoding distinct from windows-1252 and the error
+* ISO-8859-1 as an encoding distinct from windows-1252, HZ, and the error
   encoding are not supported.
 
 * Attempting to encode to UTF-16LE or UTF-16BE panics.
@@ -58,4 +59,3 @@ Upon `cargo build`, ensure you see don't see the `encoding-index-*` crates being
   the performance profile of the default `Vec<u8>` and `String`. The former
   involve an extra intermediate copy of the output while the latter run at the
   native speed of encoding_rs.
-

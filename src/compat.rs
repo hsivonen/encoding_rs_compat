@@ -48,7 +48,7 @@ impl EncodingWrap {
         let mut raw_encoder = RawEncoderImpl::new(self.encoding);
         {
             let RawEncoderImpl(ref mut encoder) = raw_encoder;
-            output.reserve(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+            output.reserve(encoder.max_buffer_length_from_utf8_without_replacement(input.len()).unwrap());
         }
         let mut total_read = 0usize;
         loop {
@@ -81,7 +81,7 @@ impl EncodingWrap {
         let mut raw_encoder = RawEncoderImpl::new(self.encoding);
         {
             let RawEncoderImpl(ref mut encoder) = raw_encoder;
-            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()).unwrap());
         }
         let mut total_read = 0usize;
         loop {
@@ -115,7 +115,7 @@ impl EncodingWrap {
         let mut raw_decoder = RawDecoderImpl::new(self.encoding);
         {
             let RawDecoderImpl(ref mut decoder) = raw_decoder;
-            output.reserve(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+            output.reserve(decoder.max_utf8_buffer_length_without_replacement(input.len()).unwrap());
         }
         let mut total_read = 0usize;
         loop {
@@ -149,7 +149,7 @@ impl EncodingWrap {
         let mut raw_decoder = RawDecoderImpl::new(self.encoding);
         {
             let RawDecoderImpl(ref mut decoder) = raw_decoder;
-            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()).unwrap());
         }
         let mut total_read = 0usize;
         loop {
@@ -330,7 +330,7 @@ impl RawDecoderImpl {
                                             last: bool)
                                             -> (RawDecoderResult, usize) {
         let &mut RawDecoderImpl(ref mut decoder) = self;
-        let needed = decoder.max_utf8_buffer_length_without_replacement(src.len());
+        let needed = decoder.max_utf8_buffer_length_without_replacement(src.len()).unwrap();
         let available = dst.capacity() - dst.len();
         if needed > available {
             dst.reserve(needed);
@@ -376,7 +376,7 @@ impl RawDecoder for RawDecoderImpl {
     fn raw_feed(&mut self, input: &[u8], output: &mut StringWriter) -> (usize, Option<CodecError>) {
         {
             let &mut RawDecoderImpl(ref mut decoder) = self;
-            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()));
+            output.writer_hint(decoder.max_utf8_buffer_length_without_replacement(input.len()).unwrap());
         }
         let (result, read) = self.decode_without_replacement(input, output, false);
         match result {
@@ -445,7 +445,7 @@ impl RawEncoderImpl {
                                             -> (RawEncoderResult, usize) {
         let &mut RawEncoderImpl(ref mut encoder) = self;
         let mut buffer: [u8; ENCODER_BUFFER_LENGTH] = unsafe { ::std::mem::uninitialized() };
-        dst.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(src.len()));
+        dst.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(src.len()).unwrap());
         let mut total_read = 0usize;
         loop {
             let (result, read, written) =
@@ -474,7 +474,7 @@ impl RawEncoderImpl {
                                          last: bool)
                                          -> (RawEncoderResult, usize) {
         let &mut RawEncoderImpl(ref mut encoder) = self;
-        let needed = encoder.max_buffer_length_from_utf8_without_replacement(src.len());
+        let needed = encoder.max_buffer_length_from_utf8_without_replacement(src.len()).unwrap();
         let available = dst.capacity() - dst.len();
         if needed > available {
             dst.reserve(needed);
@@ -520,7 +520,7 @@ impl RawEncoder for RawEncoderImpl {
     fn raw_feed(&mut self, input: &str, output: &mut ByteWriter) -> (usize, Option<CodecError>) {
         {
             let &mut RawEncoderImpl(ref mut encoder) = self;
-            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()));
+            output.writer_hint(encoder.max_buffer_length_from_utf8_without_replacement(input.len()).unwrap());
         }
         let (result, read) = self.encode_without_replacement(input, output, false);
         match result {
